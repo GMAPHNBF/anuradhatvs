@@ -269,6 +269,10 @@
         <span id="navCartBadge" class="hidden px-2 py-0.5 text-[11px] font-mono font-bold rounded-full bg-[#D90429] text-white">0</span>
       </button>
 
+      <button data-t="bikesale" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer">
+        <span class="flex items-center gap-3"><i data-lucide="bike" class="w-4 h-4"></i> Brand New Bike Sale</span>
+      </button>
+
       <button data-t="service" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer">
         <span class="flex items-center gap-3"><i data-lucide="wrench" class="w-4 h-4"></i> Bike Service</span>
         <span id="navActiveJobsBadge" class="px-2 py-0.5 text-[11px] font-mono font-bold rounded-full bg-amber-500/20 text-amber-300">0</span>
@@ -281,6 +285,11 @@
 
       <button data-t="petty" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer">
         <span class="flex items-center gap-3"><i data-lucide="wallet" class="w-4 h-4"></i> Petty Cash</span>
+      </button>
+
+      <button data-t="dues" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer">
+        <span class="flex items-center gap-3"><i data-lucide="hand-coins" class="w-4 h-4"></i> Credit &amp; Dues</span>
+        <span id="navDuesBadge" class="hidden px-2 py-0.5 text-[11px] font-mono font-bold rounded-full bg-amber-500/20 text-amber-300">0</span>
       </button>
 
       <div class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Records &amp; Insights</div>
@@ -544,12 +553,6 @@
 
           <!-- LEFT: Parts Catalog & Service Labour Selector (7 cols) -->
           <div class="xl:col-span-7 space-y-5">
-            <!-- Bill Mode Toggle -->
-            <div class="inline-flex rounded-xl bg-slate-200 dark:bg-slate-800 p-1 text-xs font-bold">
-              <button type="button" id="modeSvc" onclick="setBillMode('service')" class="px-4 py-2 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm cursor-pointer">Service / Parts Bill</button>
-              <button type="button" id="modeBike" onclick="setBillMode('bike')" class="px-4 py-2 rounded-lg text-slate-500 dark:text-slate-400 cursor-pointer">Bike Sale (Cash / Leasing)</button>
-            </div>
-
             <!-- Customer Details & Auto-Lookup -->
             <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
               <div class="flex items-center justify-between mb-3">
@@ -574,7 +577,7 @@
                 <div>
                   <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">TVS / Bike Model</label>
                   <div class="flex gap-1.5">
-                    <select id="c_model" onchange="syncBikeSale()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></select>
+                    <select id="c_model" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></select>
                     <button type="button" title="Add model" onclick="openListModal('models')" class="px-3 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-sm font-extrabold cursor-pointer">+</button>
                   </div>
                 </div>
@@ -592,57 +595,6 @@
               </div>
               <div id="custSuggest" class="mt-3 hidden"></div>
               <div id="custLast" class="mt-2 hidden text-[11px] text-slate-500 dark:text-slate-400"></div>
-            </div>
-
-            <!-- BIKE SALE PANEL -->
-            <div id="bikePanel" class="hidden bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
-              <h3 class="font-bold text-sm uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                <i data-lucide="bike" class="w-4 h-4 text-[#D90429]"></i> Bike Sale Details
-              </h3>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Chassis No</label><input id="k_chassis" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono uppercase" placeholder="Optional"></div>
-                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Engine No</label><input id="k_engine" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono uppercase" placeholder="Optional"></div>
-                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Colour</label><input id="k_colour" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none" placeholder="Optional"></div>
-                <div class="sm:col-span-3"><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Selling Price (Rs)</label><input id="k_price" type="number" min="0" oninput="syncBikeSale()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right font-bold" placeholder="0"></div>
-              </div>
-
-              <div>
-                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Payment Type</label>
-                <div class="inline-flex rounded-xl bg-slate-200 dark:bg-slate-800 p-1 text-xs font-bold">
-                  <button type="button" id="kindCash" onclick="setSaleKind('cash')" class="px-5 py-2 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm cursor-pointer">Cash</button>
-                  <button type="button" id="kindLease" onclick="setSaleKind('leasing')" class="px-5 py-2 rounded-lg text-slate-500 dark:text-slate-400 cursor-pointer">Leasing</button>
-                </div>
-              </div>
-
-              <div id="leaseBox" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-xl bg-amber-500/5 border border-amber-500/20">
-                <div class="sm:col-span-2"><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Leasing Company</label><input id="k_company" list="leaseCompanies" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none" placeholder="e.g. LOLC / Singer Finance / People's Leasing"><datalist id="leaseCompanies"><option value="LOLC Finance"><option value="Singer Finance"><option value="People's Leasing"><option value="Commercial Credit"><option value="Sampath Leasing"><option value="HNB Finance"><option value="Softlogic Finance"></datalist></div>
-                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Down Payment (Rs)</label><input id="k_down" type="number" min="0" oninput="syncBikeSale()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right" placeholder="0"></div>
-                <div></div>
-                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Leasing Document Charge (Rs)</label><input id="k_doc" type="number" min="0" oninput="syncBikeSale()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right" placeholder="0"></div>
-                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Doc Charge - How handled?</label>
-                  <select id="k_docBy" onchange="syncBikeSale()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none">
-                    <option value="cust">Paid by customer (cash)</option>
-                    <option value="cap">Capitalised (added to lease)</option>
-                    <option value="shop">Paid by shop</option>
-                  </select></div>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">RMV Registration Fee (Rs)</label><input id="k_rmv" type="number" min="0" oninput="syncBikeSale()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right" placeholder="0"></div>
-                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">RMV - Paid?</label>
-                  <select id="k_rmvBy" onchange="syncBikeSale()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none">
-                    <option value="cust">Paid by customer (add to bill)</option>
-                    <option value="shop">Paid by shop</option>
-                    <option value="pending">Not paid yet (pending)</option>
-                  </select></div>
-              </div>
-
-              <div class="space-y-1.5">
-                <label class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer"><input type="checkbox" id="k_petty" checked class="rounded"> Shop-paid RMV / doc charge &rarr; record in Petty Cash (Out)</label>
-                <label class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer"><input type="checkbox" id="k_pettyIn" class="rounded"> Cash received now &rarr; also add to Petty Cash (In)</label>
-              </div>
-
-              <div id="saleSummary" class="rounded-xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 p-3 text-xs space-y-1"></div>
             </div>
 
             <div id="svcPanels" class="space-y-5">
@@ -1040,10 +992,10 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
             <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Date</label><input id="pc_date" type="date" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></div>
             <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Type</label><select id="pc_type" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"><option value="out">Cash Out (expense)</option><option value="in">Cash In</option></select></div>
-            <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Category</label><select id="pc_cat" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"><option>Opening float / top-up</option><option>Cash from sales</option><option>Other income</option><option>RMV fee</option><option>Leasing doc charge</option><option>Fuel</option><option>Tea / meals</option><option>Transport</option><option>Stationery</option><option>Electricity / water / bills</option><option>Staff advance</option><option>Repairs / maintenance</option><option>Other expense</option></select></div>
+            <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Category</label><div class="flex gap-1.5"><select id="pc_cat" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></select><button type="button" title="Add category" onclick="openListModal('cats')" class="px-3 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-sm font-extrabold cursor-pointer">+</button></div></div>
             <div class="lg:col-span-2"><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Description</label><input id="pc_desc" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none" placeholder="e.g. RMV fee for WP BAA-1234"></div>
             <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Amount (Rs)</label><input id="pc_amt" type="number" min="0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right"></div>
-            <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Bill / Ref No</label><input id="pc_ref" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono" placeholder="Optional"></div>
+            <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Bill / Ref No</label><input id="pc_ref" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono" placeholder="Auto (PC-0001)"></div>
             <div class="lg:col-span-5 flex items-end"><button onclick="addPetty()" class="px-6 py-2.5 rounded-xl bg-[#D90429] hover:bg-[#B00321] text-white font-bold text-sm cursor-pointer">Save Entry</button></div>
           </div>
         </div>
@@ -1065,6 +1017,123 @@
                 <th class="py-3 px-3">Date</th><th class="py-3 px-3">Category</th><th class="py-3 px-3">Description</th><th class="py-3 px-3">Ref</th><th class="py-3 px-3 text-right">In / Out</th><th class="py-3 px-3 text-right">Balance</th><th class="py-3 px-3"></th>
               </tr></thead>
               <tbody id="pcBody" class="divide-y divide-slate-100 dark:divide-slate-800/80 text-sm"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 8. BRAND NEW BIKE SALE ==================== -->
+      <section id="bikesale" class="tab-section">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+          <div class="xl:col-span-7 space-y-5">
+
+            <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+              <h3 class="font-bold text-sm uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2"><i data-lucide="user-check" class="w-4 h-4 text-[#D90429]"></i> Customer</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Customer NIC</label><input id="bs_nic" oninput="lookupBS('bs_nic')" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono uppercase" placeholder="NIC number"></div>
+                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Phone / TP</label><input id="bs_phone" oninput="lookupBS('bs_phone')" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono" placeholder="07X XXX XXXX"></div>
+                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Customer Name</label><input id="bs_name" oninput="lookupBS('bs_name')" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none" placeholder="Full name"></div>
+                <div class="sm:col-span-2"><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Address (optional)</label><input id="bs_addr" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></div>
+                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Bike Reg. No</label><input id="bs_bike" oninput="lookupBS('bs_bike')" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono uppercase" placeholder="Not registered yet"></div>
+              </div>
+              <div id="bs_suggest" class="mt-3 hidden"></div>
+              <div id="bs_dueWarn" class="mt-3 hidden p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs font-semibold text-amber-700 dark:text-amber-300"></div>
+            </div>
+
+            <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+              <h3 class="font-bold text-sm uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2"><i data-lucide="bike" class="w-4 h-4 text-[#D90429]"></i> Bike &amp; Price</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="sm:col-span-2"><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">TVS / Bike Model</label><div class="flex gap-1.5"><select id="bs_model" oninput="renderBS()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></select><button type="button" title="Add model" onclick="openListModal('models')" class="px-3 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-sm font-extrabold cursor-pointer">+</button></div></div>
+                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Colour</label><input id="bs_colour" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></div>
+                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Chassis No</label><input id="bs_chassis" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono uppercase"></div>
+                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Engine No</label><input id="bs_engine" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono uppercase"></div>
+                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Bike Amount (Rs)</label><input id="bs_price" type="number" min="0" oninput="renderBS()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right font-bold"></div>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Payment Type</label>
+                <div class="inline-flex rounded-xl bg-slate-200 dark:bg-slate-800 p-1 text-xs font-bold">
+                  <button type="button" id="bsCash" onclick="setBSKind('cash')" class="px-6 py-2 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm cursor-pointer">Cash</button>
+                  <button type="button" id="bsLease" onclick="setBSKind('leasing')" class="px-6 py-2 rounded-lg text-slate-500 dark:text-slate-400 cursor-pointer">Leasing</button>
+                </div>
+              </div>
+
+              <div id="bsLeaseBox" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-xl bg-amber-500/5 border border-amber-500/20">
+                <div class="sm:col-span-2"><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Leasing Company</label><div class="flex gap-1.5"><select id="bs_company" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></select><button type="button" title="Add leasing company" onclick="openListModal('companies')" class="px-3 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-sm font-extrabold cursor-pointer">+</button></div></div>
+                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Down Payment (Rs)</label><input id="bs_down" type="number" min="0" oninput="renderBS()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right"></div>
+                <div></div>
+                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Leasing Document Charge (Rs)</label><input id="bs_docAmt" type="number" min="0" oninput="renderBS()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right"></div>
+                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Doc Charge - How handled?</label>
+                  <select id="bs_docBy" onchange="renderBS()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"><option value="cust">Paid by customer</option><option value="cap">Capitalised (added to lease)</option><option value="shop">Paid by shop</option></select></div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">RMV Registration Fee (Rs)</label><input id="bs_rmv" type="number" min="0" oninput="renderBS()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right"></div>
+                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">RMV - Paid?</label>
+                  <select id="bs_rmvBy" onchange="renderBS()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none">
+                    <option value="cust">Paid by customer (now)</option>
+                    <option value="shop">Paid by shop</option>
+                    <option value="cap">Capitalised by leasing company</option>
+                    <option value="pending">Not paid - customer pays later (RMV due)</option>
+                  </select></div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Amount Received Now (Rs)</label><input id="bs_paid" type="number" min="0" oninput="renderBS()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right" placeholder="Blank = full amount"></div>
+                <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Received Via</label>
+                  <select id="bs_payVia" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"><option value="Cash">Cash</option><option value="Card">Card</option><option value="Bank Transfer / QR">Bank Transfer / QR</option></select></div>
+              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">If less than the full amount is received, the balance is saved as <b>Credit (naya)</b> under Credit &amp; Dues. NIC is then required.</p>
+
+              <div class="space-y-1.5">
+                <label class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer"><input type="checkbox" id="bs_petty" checked class="rounded"> Shop-paid RMV / doc charge &rarr; record in Petty Cash (Out)</label>
+                <label class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer"><input type="checkbox" id="bs_pettyIn" class="rounded"> Cash received now &rarr; also add to Petty Cash (In)</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="xl:col-span-5 bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm shadow-lg xl:sticky xl:top-20 space-y-3">
+            <h3 class="font-extrabold text-base text-slate-900 dark:text-white">Sale Summary</h3>
+            <div id="bsSummary" class="text-xs space-y-1.5"></div>
+            <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Bill Entered By (Staff)</label><input id="bs_staff" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+              <button onclick="saveBikeSale(true)" class="sm:col-span-2 py-3.5 px-5 rounded-xl bg-[#D90429] hover:bg-[#B00321] text-white font-extrabold text-sm flex items-center justify-center gap-2 cursor-pointer"><i data-lucide="printer" class="w-4 h-4"></i> Save Sale &amp; Print Bill</button>
+              <button onclick="saveBikeSale(false)" class="py-2.5 px-4 rounded-xl bg-[#14213D] hover:bg-slate-800 text-white font-bold text-xs cursor-pointer">Save Only</button>
+              <button onclick="resetBS()" class="py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold cursor-pointer">Clear Form</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 9. CREDIT & DUES ==================== -->
+      <section id="dues" class="tab-section space-y-6">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm"><div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Credit outstanding</div><div id="du_credit" class="text-2xl font-extrabold mono mt-1 text-[#D90429]">Rs 0.00</div></div>
+          <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm"><div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">RMV outstanding</div><div id="du_rmv" class="text-2xl font-extrabold mono mt-1 text-amber-600 dark:text-amber-400">Rs 0.00</div></div>
+          <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm"><div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Open accounts</div><div id="du_cnt" class="text-2xl font-extrabold mono mt-1 text-slate-900 dark:text-white">0</div></div>
+          <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm"><div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Collected today</div><div id="du_today" class="text-2xl font-extrabold mono mt-1 text-emerald-600 dark:text-emerald-400">Rs 0.00</div></div>
+        </div>
+        <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 class="font-bold text-base text-slate-900 dark:text-white">Customer Credit &amp; RMV Dues</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Search by NIC, name, phone, bike no or bill no. Receive payments later and print receipts.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <input id="du_search" oninput="renderDues()" placeholder="Search NIC / name / bike..." class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:outline-none">
+              <select id="du_kind" onchange="renderDues()" class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-xs focus:outline-none"><option value="">All types</option><option value="credit">Credit (naya)</option><option value="rmv">RMV due</option></select>
+              <select id="du_status" onchange="renderDues()" class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-xs focus:outline-none"><option value="open">Open only</option><option value="settled">Settled</option><option value="">All</option></select>
+              <button onclick="xDues()" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer">Excel Report</button>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead><tr class="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-50/70 dark:bg-slate-900/50">
+                <th class="py-3 px-3">Date / Bill</th><th class="py-3 px-3">Customer</th><th class="py-3 px-3">Bike</th><th class="py-3 px-3">Type</th><th class="py-3 px-3 text-right">Amount</th><th class="py-3 px-3 text-right">Paid</th><th class="py-3 px-3 text-right">Balance</th><th class="py-3 px-3 text-right">Actions</th>
+              </tr></thead>
+              <tbody id="duBody" class="divide-y divide-slate-100 dark:divide-slate-800/80 text-sm"></tbody>
             </table>
           </div>
         </div>
@@ -1135,6 +1204,25 @@
   </div>
 </div>
 
+<!-- Receive due payment modal -->
+<div id="duePayModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/65 backdrop-blur-xs p-4">
+  <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+    <h3 class="font-extrabold text-base text-slate-900 dark:text-white">Receive Payment</h3>
+    <input type="hidden" id="dp_id">
+    <div id="dp_info" class="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed"></div>
+    <div class="mt-3 space-y-3">
+      <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Amount (Rs)</label><input id="dp_amt" type="number" min="0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right font-bold"></div>
+      <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Received Via</label><select id="dp_method" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"><option>Cash</option><option>Card</option><option>Bank Transfer / QR</option></select></div>
+      <label class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer"><input type="checkbox" id="dp_petty" checked class="rounded"> If cash &rarr; add to Petty Cash (In)</label>
+    </div>
+    <div class="flex justify-end gap-2 mt-5">
+      <button onclick="closeModal('duePayModal')" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold cursor-pointer">Cancel</button>
+      <button onclick="saveDuePay(false)" class="px-4 py-2 rounded-xl bg-[#14213D] text-white text-xs font-bold cursor-pointer">Save</button>
+      <button onclick="saveDuePay(true)" class="px-4 py-2 rounded-xl bg-[#D90429] text-white text-xs font-bold cursor-pointer">Save &amp; Print</button>
+    </div>
+  </div>
+</div>
+
 <!-- Add to list modal -->
 <div id="listModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/65 backdrop-blur-xs p-4">
   <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl">
@@ -1190,7 +1278,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth(), db = firebase.firestore();
 
 let items = [], bills = [], jobs = [], petty = [], cart = [], unsubs = [];
-let billMode = 'service', saleKind = 'cash';
+let dues = [], bsKind = 'cash';
 let stockCatFilter = 'ALL', stockLowOnly = false, jobStatusFilter = 'ALL', discMode = 'rs';
 let salesChartInstance = null, catChartInstance = null;
 
@@ -1264,7 +1352,9 @@ const PAGE_META = {
   stock: ["Stock & Spare Parts", "Inventory catalog, restocking, profit margins & low-stock alerts"],
   bills: ["Bill History Archive", "Search past invoices, reprint receipts or void transactions"],
   reports: ["Analytics & Excel Reports", "Financial summaries, top selling parts & XLSX exports"],
-  petty: ["Petty Cash", "Office cash in / out book with running balance"]
+  petty: ["Petty Cash", "Office cash in / out book with running balance"],
+  bikesale: ["Brand New Bike Sale", "Cash or leasing sale, RMV, down payment & customer credit"],
+  dues: ["Credit & Dues", "Customers who owe credit or RMV fees - search by NIC, collect later"]
 };
 
 function switchTab(t) {
@@ -1287,6 +1377,8 @@ function switchTab(t) {
   if (t === "dashboard") renderDashboard();
   if (t === "bill") renderPosCatalog();
   if (t === "petty") renderPetty();
+  if (t === "dues") renderDues();
+  if (t === "bikesale") renderBS();
 }
 
 function toggleMenu(f) {
@@ -1371,11 +1463,19 @@ auth.onAuthStateChanged(u => {
       const v = d.data();
       if (Array.isArray(v.models) && v.models.length) lists.models = v.models;
       if (Array.isArray(v.services) && v.services.length) lists.services = v.services;
+      if (Array.isArray(v.cats) && v.cats.length) lists.cats = v.cats;
+      if (Array.isArray(v.companies) && v.companies.length) lists.companies = v.companies;
     }
     fillLists();
   }, () => fillLists()));
 
+  unsubs.push(db.collection("dues").orderBy("created", "desc").limit(1000).onSnapshot(s => {
+    dues = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderDues();
+  }, e => toast("Dues: " + e.message)));
+
   $("pc_date").value = today();
+  if (!$("bs_staff").value) $("bs_staff").value = u.displayName || u.email;
   fillLists();
   lucide.createIcons();
 });
@@ -1873,7 +1973,7 @@ function renderCart() {
   $("grand").textContent = "Total: " + rs(net);
 
   const paid = +$("b_paid").value || 0;
-  const dueNow = billMode === "bike" ? saleCalc().paidNow : net;
+  const dueNow = net;
   if (paid > 0) {
     $("changeRow").classList.remove("hidden");
     $("changeText").textContent = rs(paid - dueNow);
@@ -1898,27 +1998,10 @@ function adjCartQty(idx, delta) {
 
 async function saveBill(shouldPrint = true) {
   if (!cart.length) return toast("Bill is empty");
-  let sale = null;
-  if (billMode === "bike") {
-    sale = saleSnapshot();
-    if (!(sale.price > 0)) return toast("Enter the bike selling price");
-    if (sale.kind === "leasing" && !sale.company) return toast("Enter the leasing company");
-  }
   try {
     const lines = [...cart];
     const disc = calcDiscount();
-    const payMethod = sale && sale.kind === "leasing" ? "Leasing" : $("b_payMethod").value;
-    const payVia = $("b_payMethod").value;
-    const bikeNoTxt = $("c_bike").value.trim().toUpperCase() || ($("c_model").value || "bike");
-    const pettyList = [];
-    if (sale) {
-      sale.payVia = payVia;
-      if ($("k_petty").checked) {
-        if (sale.rmvBy === "shop" && sale.rmv > 0) pettyList.push({ type: "out", cat: "RMV fee", desc: "RMV fee - " + bikeNoTxt, amt: sale.rmv });
-        if (sale.kind === "leasing" && sale.docBy === "shop" && sale.doc > 0) pettyList.push({ type: "out", cat: "Leasing doc charge", desc: "Leasing doc charge - " + bikeNoTxt, amt: sale.doc });
-      }
-      if ($("k_pettyIn").checked && payVia === "Cash" && sale.paidNow > 0) pettyList.push({ type: "in", cat: "Cash from sales", desc: "Bike sale cash received - " + bikeNoTxt, amt: sale.paidNow });
-    }
+    const payMethod = $("b_payMethod").value;
 
     const bill = await db.runTransaction(async t => {
       const cRef = db.doc("meta/counters"), cDoc = await t.get(cRef);
@@ -1942,10 +2025,9 @@ async function saveBill(shouldPrint = true) {
         phone: $("c_phone").value.trim(),
         bike: $("c_bike").value.trim().toUpperCase(),
         model: $("c_model").value || "",
-        svcType: billMode === "bike" ? "Bike Sale" : ($("c_svc").value || ""),
-        type: billMode,
+        svcType: $("c_svc").value || "",
+        type: "service",
         staff: $("c_staff").value.trim() || auth.currentUser.displayName || auth.currentUser.email,
-        sale,
         lines,
         disc,
         payMethod,
@@ -1954,7 +2036,6 @@ async function saveBill(shouldPrint = true) {
         created: Date.now()
       };
       t.set(db.collection("bills").doc(), b);
-      pettyList.forEach(p => t.set(db.collection("petty").doc(), { date: today(), type: p.type, cat: p.cat, desc: p.desc, amt: p.amt, ref: no, by: auth.currentUser.email, created: Date.now() }));
       return b;
     });
 
@@ -1966,8 +2047,6 @@ async function saveBill(shouldPrint = true) {
     $("custVisitBadge").classList.add("hidden");
     $("custSuggest").classList.add("hidden");
     $("custLast").classList.add("hidden");
-    ["k_chassis", "k_engine", "k_colour", "k_price", "k_company", "k_down", "k_doc", "k_rmv"].forEach(i => $(i).value = "");
-    if (billMode === "bike") syncBikeSale();
 
     toast("Invoice " + bill.no + " saved!");
     if (shouldPrint) printBill(bill);
@@ -2115,7 +2194,6 @@ function convertJobToBill(id) {
   $("c_name").value = j.name || "";
   $("c_phone").value = j.phone || "";
   $("c_bike").value = j.bike || "";
-  setBillMode("service");
   setSel("c_model", j.model);
   setSel("c_svc", j.type);
   ["c_name", "c_phone", "c_bike"].forEach(i => $(i).dataset.auto = "0");
@@ -2378,6 +2456,8 @@ async function xJobs() {
 const SHOP = { name: "ANURADHA TVS", phone: "0777172740" };
 const lists = {
   models: ["TVS Apache RTR 160","TVS Apache RTR 160 4V","TVS Apache RTR 180","TVS Apache RTR 200 4V","TVS Apache RR 310","TVS Raider 125","TVS Ntorq 125","TVS Jupiter 110","TVS Jupiter 125","TVS Star City+","TVS HLX 125","TVS XL100","TVS Scooty Pep+","TVS Scooty Zest","TVS iQube (Electric)","TVS King (3-Wheeler)","Other"],
+  cats: ["Opening float / top-up","Cash from sales","Customer dues received","Other income","RMV fee","Leasing doc charge","Fuel","Tea / meals","Transport","Stationery","Electricity / water / bills","Staff advance","Repairs / maintenance","Other expense"],
+  companies: ["LOLC Finance","Singer Finance (Lanka)","People's Leasing & Finance","Commercial Credit & Finance","Sampath Bank (Leasing)","HNB Finance","Central Finance","Senkadagala Finance","Orient Finance","Mercantile Investments","Softlogic Finance","Siyapatha Finance","Nations Trust Bank","Alliance Finance","Janashakthi Finance","Richard Pieris Finance","Vallibel Finance","Abans Finance","MBSL Finance","ETI Finance","Other"],
   services: ["Full service","1st free service","2nd free service","3rd free service","Oil change","Brake repair","Engine repair","Electrical","Tyre / puncture","Chain & sprocket","Clutch repair","Suspension repair","Washing","Other"]
 };
 let listKind = "models";
@@ -2389,17 +2469,17 @@ function setSel(id, val) {
   el.value = val;
 }
 function fillLists() {
-  [["c_model", "models"], ["s_model", "models"], ["c_svc", "services"], ["s_type", "services"]].forEach(([id, k]) => {
+  [["c_model", "models"], ["s_model", "models"], ["c_svc", "services"], ["s_type", "services"], ["pc_cat", "cats"], ["bs_model", "models", 1], ["bs_company", "companies", 1]].forEach(([id, k, blank]) => {
     const el = $(id); if (!el) return;
     const cur = el.value;
-    el.innerHTML = lists[k].map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
+    el.innerHTML = (blank ? '<option value="">-- select --</option>' : "") + lists[k].map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
     if (cur) setSel(id, cur);
   });
   if ($("listModal") && !$("listModal").classList.contains("hidden")) renderListChips();
 }
 function openListModal(kind) {
   listKind = kind;
-  $("lmTitle").textContent = kind === "models" ? "Add TVS / Bike Model" : "Add Service Type";
+  $("lmTitle").textContent = { models: "Add TVS / Bike Model", services: "Add Service Type", cats: "Add Petty Cash Category", companies: "Add Leasing Company" }[kind];
   $("lmInput").value = "";
   renderListChips();
   openModal("listModal");
@@ -2411,7 +2491,7 @@ function renderListChips() {
       <button onclick="removeListItem(${i})" title="Remove" class="text-slate-400 hover:text-[#D90429] cursor-pointer">&times;</button></span>`).join("");
 }
 async function persistLists() {
-  try { await db.doc("meta/lists").set({ models: lists.models, services: lists.services }, { merge: true }); }
+  try { await db.doc("meta/lists").set({ models: lists.models, services: lists.services, cats: lists.cats, companies: lists.companies }, { merge: true }); }
   catch (e) { toast("Saved on this screen only: " + e.message); }
 }
 async function saveListItem() {
@@ -2437,6 +2517,7 @@ async function removeListItem(i) {
 //  CUSTOMER LOOKUP  (bike no / phone -> old details)
 // =====================================================================
 const normBike = s => String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+const normNic = s => String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
 const normPhone = s => {
   let d = String(s || "").replace(/\D/g, "");
   if (d.startsWith("94") && d.length >= 11) d = "0" + d.slice(2);
@@ -2444,7 +2525,8 @@ const normPhone = s => {
 };
 function customerRecords() {
   return [
-    ...bills.map(b => ({ src: "bill", ref: b.no, name: b.name === "Walk-in" ? "" : b.name, phone: b.phone, bike: b.bike, model: b.model, type: b.svcType, date: b.date, total: b.total, ts: b.created || 0 })),
+    ...bills.map(b => ({ src: "bill", ref: b.no, name: b.name === "Walk-in" ? "" : b.name, phone: b.phone, nic: b.nic, bike: b.bike, model: b.model, type: b.svcType, date: b.date, total: b.total, ts: b.created || 0 })),
+    ...dues.map(d => ({ src: "due", ref: d.billNo, name: d.name, phone: d.phone, nic: d.nic, bike: d.bike, model: d.model, type: d.kind === "rmv" ? "RMV due" : "Credit due", date: d.date, total: d.amount, ts: d.created || 0 })),
     ...jobs.map(j => ({ src: "job", ref: j.job, name: j.name, phone: j.phone, bike: j.bike, model: j.model, type: j.type, date: j.date, total: j.est, ts: j.created || 0 }))
   ];
 }
@@ -2462,20 +2544,21 @@ function clearAuto(ids) {
 
 function lookupGeneric(cfg, src) {
   if (src) $(src).dataset.auto = "0";
-  const ph = normPhone($(cfg.phone).value), bk = normBike($(cfg.bike).value);
+  const ph = normPhone($(cfg.phone).value), bk = normBike($(cfg.bike).value), nc = cfg.nic ? normNic($(cfg.nic).value) : "";
   const sugg = $(cfg.suggest);
   const last = cfg.last ? $(cfg.last) : null;
   const badge = cfg.badge ? $(cfg.badge) : null;
   const hide = () => { sugg.classList.add("hidden"); sugg.innerHTML = ""; if (last) last.classList.add("hidden"); if (badge) badge.classList.add("hidden"); };
 
-  if (ph.length < 7 && bk.length < 4) { hide(); clearAuto([cfg.phone, cfg.bike, cfg.name, cfg.model]); return; }
+  if (ph.length < 7 && bk.length < 4 && nc.length < 6) { hide(); clearAuto([cfg.phone, cfg.bike, cfg.name, cfg.model, cfg.nic]); return; }
 
   const matches = customerRecords().filter(r =>
     (ph.length >= 7 && normPhone(r.phone).includes(ph)) ||
-    (bk.length >= 4 && normBike(r.bike).includes(bk))
+    (bk.length >= 4 && normBike(r.bike).includes(bk)) ||
+    (nc.length >= 6 && normNic(r.nic).includes(nc))
   ).sort((a, b) => b.ts - a.ts);
 
-  if (!matches.length) { hide(); clearAuto([cfg.phone, cfg.bike, cfg.name, cfg.model]); return; }
+  if (!matches.length) { hide(); clearAuto([cfg.phone, cfg.bike, cfg.name, cfg.model, cfg.nic]); return; }
 
   const uniq = [], seen = new Set();
   matches.forEach(r => { const k = normBike(r.bike) + "|" + normPhone(r.phone); if (!seen.has(k)) { seen.add(k); uniq.push(r); } });
@@ -2486,6 +2569,7 @@ function lookupGeneric(cfg, src) {
     if (src !== cfg.phone) autoSet(cfg.phone, r.phone);
     if (src !== cfg.bike) autoSet(cfg.bike, r.bike);
     if (src !== cfg.name) autoSet(cfg.name, r.name);
+    if (cfg.nic && src !== cfg.nic) autoSet(cfg.nic, r.nic);
     if (r.model) setSel(cfg.model, r.model);
     sugg.classList.add("hidden"); sugg.innerHTML = "";
     if (badge) { badge.textContent = `Returning Customer (${matches.length} prior visit${matches.length > 1 ? "s" : ""})`; badge.classList.remove("hidden"); }
@@ -2497,18 +2581,21 @@ function lookupGeneric(cfg, src) {
     if (badge) badge.classList.add("hidden");
     if (last) last.classList.add("hidden");
     sugg.innerHTML = `<div class="text-[11px] font-bold text-slate-400 mb-1">${uniq.length} matches — tap one:</div><div class="flex flex-wrap gap-1.5">` +
-      uniq.slice(0, 6).map((r, i) => `<button type="button" onclick="pickCustomer('${cfg.key}', ${i})" class="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[11px] text-left cursor-pointer"><b class="mono">${esc(r.bike || "-")}</b> • ${esc(r.name || "-")} • <span class="mono">${esc(r.phone || "-")}</span>${r.model ? " • " + esc(r.model) : ""}</button>`).join("") + `</div>`;
+      uniq.slice(0, 6).map((r, i) => `<button type="button" onclick="pickCustomer('${cfg.key}', ${i})" class="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[11px] text-left cursor-pointer"><b class="mono">${esc(r.bike || "-")}</b> • ${esc(r.name || "-")} • <span class="mono">${esc(r.phone || "-")}</span>${r.nic ? " • " + esc(r.nic) : ""}${r.model ? " • " + esc(r.model) : ""}</button>`).join("") + `</div>`;
     sugg.classList.remove("hidden");
   }
 }
 const POS_LOOKUP = { key: "pos", phone: "c_phone", bike: "c_bike", name: "c_name", model: "c_model", suggest: "custSuggest", last: "custLast", badge: "custVisitBadge" };
+const BS_LOOKUP = { key: "bs", phone: "bs_phone", bike: "bs_bike", name: "bs_name", nic: "bs_nic", suggest: "bs_suggest" };
 const SVC_LOOKUP = { key: "svc", phone: "s_phone", bike: "s_bike", name: "s_name", model: "s_model", suggest: "s_suggest" };
 function lookupCustomer(src) { lookupGeneric(POS_LOOKUP, src); }
 function lookupService(src) { lookupGeneric(SVC_LOOKUP, src); }
+function lookupBS(src) { lookupGeneric(BS_LOOKUP, src); dueWarn(); }
 function pickCustomer(key, i) {
-  const cfg = key === "pos" ? POS_LOOKUP : SVC_LOOKUP, r = (cfg._cands || [])[i];
+  const cfg = { pos: POS_LOOKUP, svc: SVC_LOOKUP, bs: BS_LOOKUP }[key], r = (cfg._cands || [])[i];
   if (!r) return;
-  [cfg.phone, cfg.bike, cfg.name].forEach(id => $(id).dataset.auto = "0");
+  [cfg.phone, cfg.bike, cfg.name, cfg.nic].forEach(id => { if (id) $(id).dataset.auto = "0"; });
+  if (cfg.nic) $(cfg.nic).value = r.nic || "";
   $(cfg.phone).value = r.phone || ""; $(cfg.bike).value = (r.bike || "").toUpperCase(); $(cfg.name).value = r.name || "";
   if (r.model) setSel(cfg.model, r.model);
   lookupGeneric(cfg, null);
@@ -2517,71 +2604,6 @@ function pickCustomer(key, i) {
 // =====================================================================
 //  BIKE SALE  (cash / leasing, RMV, doc charge, capitalise)
 // =====================================================================
-function setBillMode(m) {
-  if (m === billMode) return;
-  billMode = m;
-  const on = "px-4 py-2 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm cursor-pointer";
-  const off = "px-4 py-2 rounded-lg text-slate-500 dark:text-slate-400 cursor-pointer";
-  $("modeSvc").className = m === "service" ? on : off;
-  $("modeBike").className = m === "bike" ? on : off;
-  $("svcPanels").classList.toggle("hidden", m === "bike");
-  $("bikePanel").classList.toggle("hidden", m !== "bike");
-  $("c_svcWrap").classList.toggle("hidden", m === "bike");
-  clearCart();
-  $("b_disc").disabled = m === "bike";
-  if (m === "bike") syncBikeSale();
-  lucide.createIcons();
-}
-function setSaleKind(k) {
-  saleKind = k;
-  const on = "px-5 py-2 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm cursor-pointer";
-  const off = "px-5 py-2 rounded-lg text-slate-500 dark:text-slate-400 cursor-pointer";
-  $("kindCash").className = k === "cash" ? on : off;
-  $("kindLease").className = k === "leasing" ? on : off;
-  $("leaseBox").classList.toggle("hidden", k !== "leasing");
-  syncBikeSale();
-}
-function saleCalc() {
-  const kind = saleKind, price = +$("k_price").value || 0;
-  const down = Math.min(price, +$("k_down").value || 0);
-  const rmv = +$("k_rmv").value || 0, rmvBy = $("k_rmvBy").value;
-  const doc = kind === "leasing" ? (+$("k_doc").value || 0) : 0, docBy = $("k_docBy").value;
-  const rmvLine = rmvBy === "cust" ? rmv : 0;
-  const docLine = kind === "leasing" && (docBy === "cust" || docBy === "cap") ? doc : 0;
-  const total = price + rmvLine + docLine;
-  let paidNow = total, lease = 0;
-  if (kind === "leasing") {
-    lease = Math.max(0, price - down) + (docBy === "cap" ? docLine : 0);
-    paidNow = down + rmvLine + (docBy === "cust" ? docLine : 0);
-  }
-  return { kind, price, down, rmv, rmvBy, doc, docBy, rmvLine, docLine, total, paidNow, lease };
-}
-function saleSnapshot() {
-  const c = saleCalc();
-  return { ...c, company: $("k_company").value.trim(), chassis: $("k_chassis").value.trim().toUpperCase(), engine: $("k_engine").value.trim().toUpperCase(), colour: $("k_colour").value.trim() };
-}
-function syncBikeSale() {
-  if (billMode !== "bike") return;
-  const c = saleCalc(), model = $("c_model").value || "Motorcycle";
-  cart = [];
-  if (c.price > 0) cart.push({ id: null, name: model + " (New Bike)", price: c.price, qty: 1 });
-  if (c.rmvLine > 0) cart.push({ id: null, name: "RMV Registration Fee", price: c.rmvLine, qty: 1 });
-  if (c.docLine > 0) cart.push({ id: null, name: c.docBy === "cap" ? "Leasing Doc Charge (Capitalised)" : "Leasing Doc Charge", price: c.docLine, qty: 1 });
-  const row = (a, b, cls = "") => `<div class="flex justify-between ${cls}"><span>${a}</span><b class="mono">${b}</b></div>`;
-  let h = row("Bike price", rs(c.price));
-  if (c.rmvBy === "pending") h += row("RMV", "NOT PAID YET", "text-amber-600");
-  else if (c.rmvBy === "shop") h += row("RMV fee (paid by shop)", rs(c.rmv));
-  else h += row("RMV fee (customer)", rs(c.rmvLine));
-  if (c.kind === "leasing") {
-    h += row("Doc charge " + (c.docBy === "cap" ? "(capitalised)" : c.docBy === "shop" ? "(paid by shop)" : "(customer)"), rs(c.doc));
-    h += row("Down payment", rs(c.down));
-    h += row("Lease amount (financed)", rs(c.lease), "text-[#D90429]");
-  }
-  h += row("Customer pays now", rs(c.paidNow), "text-emerald-600 dark:text-emerald-400 pt-1 border-t border-slate-200 dark:border-slate-700");
-  $("saleSummary").innerHTML = h;
-  renderCart();
-  updateSidebarBadges();
-}
 
 // =====================================================================
 //  BILL TEXT, QR, WHATSAPP, PRINT
@@ -2594,12 +2616,13 @@ function saleRows(b) {
   if (s.engine) r.push(["Engine No", s.engine]);
   if (s.colour) r.push(["Colour", s.colour]);
   if (s.kind === "leasing") r.push(["Down Payment", rs(s.down)]);
-  r.push(["RMV Fee", s.rmvBy === "cust" ? "Paid by customer " + rs(s.rmv) : s.rmvBy === "shop" ? "Paid by shop " + rs(s.rmv) : "NOT PAID YET" + (s.rmv ? " (" + rs(s.rmv) + ")" : "")]);
+  r.push(["RMV Fee", s.rmvBy === "cust" ? "Paid by customer " + rs(s.rmv) : s.rmvBy === "shop" ? "Paid by shop " + rs(s.rmv) : s.rmvBy === "cap" ? "Capitalised (leasing) " + rs(s.rmv) : "PENDING - customer to pay " + rs(s.rmv)]);
   if (s.kind === "leasing") {
     r.push(["Doc Charge", (s.docBy === "cap" ? "Capitalised " : s.docBy === "cust" ? "Paid by customer " : "Paid by shop ") + rs(s.doc)]);
     r.push(["Lease Amount", rs(s.lease)]);
   }
   r.push(["Paid Now", rs(s.paidNow)]);
+  if (s.creditBal > 0) r.push(["Credit Balance", rs(s.creditBal)]);
   return r;
 }
 function billPlainText(b) {
@@ -2715,9 +2738,10 @@ async function addPetty() {
   if (!(amt > 0)) return toast("Enter the amount");
   if (!desc) return toast("Enter a description");
   try {
+    const ref = $("pc_ref").value.trim() || await nextNo("pc", "PC-", 4);
     await db.collection("petty").add({
       date: $("pc_date").value || today(), type: $("pc_type").value, cat: $("pc_cat").value,
-      desc, amt, ref: $("pc_ref").value.trim(), by: auth.currentUser.email, created: Date.now()
+      desc, amt, ref, by: auth.currentUser.email, created: Date.now()
     });
     ["pc_amt", "pc_desc", "pc_ref"].forEach(i => $(i).value = "");
     toast("Petty cash entry saved");
@@ -2767,9 +2791,248 @@ function xPetty() {
   dl("Petty_Cash", asc.map(p => { bal += (p.type === "in" ? 1 : -1) * (Number(p.amt) || 0); return { Date: p.date, Type: p.type === "in" ? "Cash In" : "Cash Out", Category: p.cat, Description: p.desc, Ref: p.ref || "", Amount: p.amt, Balance: bal }; }));
 }
 
+// =====================================================================
+//  BRAND NEW BIKE SALE
+// =====================================================================
+function setBSKind(k) {
+  bsKind = k;
+  const on = "px-6 py-2 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm cursor-pointer";
+  const off = "px-6 py-2 rounded-lg text-slate-500 dark:text-slate-400 cursor-pointer";
+  $("bsCash").className = k === "cash" ? on : off;
+  $("bsLease").className = k === "leasing" ? on : off;
+  $("bsLeaseBox").classList.toggle("hidden", k !== "leasing");
+  const capOpt = [...$("bs_rmvBy").options].find(o => o.value === "cap");
+  if (capOpt) { capOpt.hidden = capOpt.disabled = k === "cash"; if (k === "cash" && $("bs_rmvBy").value === "cap") $("bs_rmvBy").value = "cust"; }
+  renderBS();
+}
+function bsCalc() {
+  const kind = bsKind, price = +$("bs_price").value || 0;
+  const down = kind === "leasing" ? Math.min(price, +$("bs_down").value || 0) : 0;
+  const rmv = +$("bs_rmv").value || 0;
+  let rmvBy = $("bs_rmvBy").value;
+  if (kind === "cash" && rmvBy === "cap") rmvBy = "cust";
+  const doc = kind === "leasing" ? (+$("bs_docAmt").value || 0) : 0, docBy = $("bs_docBy").value;
+  const rmvLine = rmvBy === "shop" ? 0 : rmv;
+  const docLine = kind === "leasing" && docBy !== "shop" ? doc : 0;
+  const total = price + rmvLine + docLine;
+  const rmvPending = rmvBy === "pending" ? rmv : 0;
+  const lease = kind === "leasing" ? Math.max(0, price - down) + (docBy === "cap" ? docLine : 0) + (rmvBy === "cap" ? rmvLine : 0) : 0;
+  const immediate = total - lease - rmvPending;
+  const raw = $("bs_paid").value.trim();
+  const paidNow = raw === "" ? immediate : Math.min(immediate, Math.max(0, +raw));
+  const creditBal = immediate - paidNow;
+  return { kind, price, down, rmv, rmvBy, doc, docBy, rmvLine, docLine, total, lease, rmvPending, immediate, paidNow, creditBal };
+}
+function renderBS() {
+  if (!$("bsSummary")) return;
+  const c = bsCalc();
+  const row = (a, b, cls = "") => `<div class="flex justify-between gap-3 ${cls}"><span>${a}</span><b class="mono">${b}</b></div>`;
+  let h = row("Bike amount", rs(c.price));
+  h += c.rmvBy === "shop" ? row("RMV (paid by shop)", rs(c.rmv)) : row("RMV " + ({ cust: "(customer)", cap: "(capitalised)", pending: "(PENDING)" }[c.rmvBy]), rs(c.rmv));
+  if (c.kind === "leasing") {
+    h += row("Doc charge " + ({ cust: "(customer)", cap: "(capitalised)", shop: "(shop)" }[c.docBy]), rs(c.doc));
+    h += row("Down payment", rs(c.down));
+    h += row("Lease amount (leasing co.)", rs(c.lease), "text-[#D90429]");
+  }
+  h += row("Invoice total", rs(c.total), "pt-1.5 border-t border-slate-200 dark:border-slate-700 text-sm");
+  h += row("Customer owes now", rs(c.immediate));
+  h += row("Received now", rs(c.paidNow), "text-emerald-600 dark:text-emerald-400");
+  if (c.creditBal > 0) h += row("Credit balance (naya)", rs(c.creditBal), "text-[#D90429]");
+  if (c.rmvPending > 0) h += row("RMV to collect later", rs(c.rmvPending), "text-amber-600 dark:text-amber-400");
+  $("bsSummary").innerHTML = h;
+}
+function resetBS() {
+  ["bs_nic", "bs_phone", "bs_name", "bs_addr", "bs_bike", "bs_colour", "bs_chassis", "bs_engine", "bs_price", "bs_down", "bs_docAmt", "bs_rmv", "bs_paid"].forEach(i => { $(i).value = ""; $(i).dataset.auto = "0"; });
+  $("bs_model").value = ""; $("bs_company").value = "";
+  $("bs_rmvBy").value = "cust"; $("bs_docBy").value = "cust"; $("bs_payVia").value = "Cash";
+  $("bs_suggest").classList.add("hidden"); $("bs_dueWarn").classList.add("hidden");
+  setBSKind("cash");
+}
+const dueBal = d => Math.max(0, (Number(d.amount) || 0) - (Number(d.paid) || 0));
+function dueWarn() {
+  const nic = normNic($("bs_nic").value), ph = normPhone($("bs_phone").value), w = $("bs_dueWarn");
+  const open = dues.filter(d => dueBal(d) > 0 && ((nic.length >= 6 && normNic(d.nic) === nic) || (ph.length >= 9 && normPhone(d.phone) === ph)));
+  if (!open.length) { w.classList.add("hidden"); return; }
+  w.textContent = `This customer still owes ${rs(open.reduce((a, d) => a + dueBal(d), 0))} (${open.length} open item${open.length > 1 ? "s" : ""}) - see Credit & Dues.`;
+  w.classList.remove("hidden");
+}
+async function saveBikeSale(shouldPrint) {
+  const c = bsCalc();
+  const model = $("bs_model").value;
+  if (!model) return toast("Select the bike model");
+  if (!(c.price > 0)) return toast("Enter the bike amount");
+  const company = $("bs_company").value;
+  if (c.kind === "leasing" && !company) return toast("Select the leasing company");
+  if (c.rmvBy === "pending" && !(c.rmv > 0)) return toast("Enter the RMV fee amount");
+  const nic = $("bs_nic").value.trim().toUpperCase(), name = $("bs_name").value.trim();
+  if ((c.creditBal > 0 || c.rmvPending > 0) && (!nic || !name)) return toast("Customer name and NIC are required for credit / RMV dues");
+
+  const lines = [{ id: null, name: model + " (New Bike)", price: c.price, qty: 1 }];
+  if (c.rmvLine > 0) lines.push({ id: null, name: "RMV Registration Fee" + (c.rmvBy === "cap" ? " (Capitalised)" : c.rmvBy === "pending" ? " (Pending)" : ""), price: c.rmvLine, qty: 1 });
+  if (c.docLine > 0) lines.push({ id: null, name: "Leasing Doc Charge" + (c.docBy === "cap" ? " (Capitalised)" : ""), price: c.docLine, qty: 1 });
+
+  const payVia = $("bs_payVia").value, bike = $("bs_bike").value.trim().toUpperCase();
+  const sale = { ...c, company: c.kind === "leasing" ? company : "", chassis: $("bs_chassis").value.trim().toUpperCase(), engine: $("bs_engine").value.trim().toUpperCase(), colour: $("bs_colour").value.trim(), payVia, nic };
+  const label = bike || model;
+  const pettyList = [];
+  if ($("bs_petty").checked) {
+    if (c.rmvBy === "shop" && c.rmv > 0) pettyList.push({ type: "out", cat: "RMV fee", desc: "RMV fee - " + label, amt: c.rmv });
+    if (c.kind === "leasing" && c.docBy === "shop" && c.doc > 0) pettyList.push({ type: "out", cat: "Leasing doc charge", desc: "Leasing doc charge - " + label, amt: c.doc });
+  }
+  if ($("bs_pettyIn").checked && payVia === "Cash" && c.paidNow > 0) pettyList.push({ type: "in", cat: "Cash from sales", desc: "Bike sale cash received - " + label, amt: c.paidNow });
+
+  try {
+    const bill = await db.runTransaction(async t => {
+      const cRef = db.doc("meta/counters"), cDoc = await t.get(cRef);
+      const n = ((cDoc.exists && cDoc.data().bill) || 0) + 1;
+      const no = "BILL-" + String(n).padStart(4, "0");
+      t.set(cRef, { bill: n }, { merge: true });
+      const b = {
+        no, date: today(), name: name || "Walk-in", phone: $("bs_phone").value.trim(), nic, bike, model,
+        svcType: "Bike Sale", type: "bike", staff: $("bs_staff").value.trim() || auth.currentUser.displayName || auth.currentUser.email,
+        sale, lines, disc: 0, payMethod: c.kind === "leasing" ? "Leasing" : payVia,
+        total: c.total, by: auth.currentUser.email, created: Date.now()
+      };
+      t.set(db.collection("bills").doc(), b);
+      const base = { billNo: no, name: b.name, phone: b.phone, nic, bike, model, date: today(), created: Date.now(), paid: 0, payments: [], by: auth.currentUser.email };
+      if (c.creditBal > 0) t.set(db.collection("dues").doc(), { ...base, kind: "credit", note: c.kind === "leasing" ? "Down payment balance" : "Bike payment balance", amount: c.creditBal });
+      if (c.rmvPending > 0) t.set(db.collection("dues").doc(), { ...base, kind: "rmv", note: "RMV fee to be paid by customer", amount: c.rmvPending });
+      pettyList.forEach(p => t.set(db.collection("petty").doc(), { date: today(), type: p.type, cat: p.cat, desc: p.desc, amt: p.amt, ref: no, by: auth.currentUser.email, created: Date.now() }));
+      return b;
+    });
+    toast("Bike sale " + bill.no + " saved!");
+    resetBS();
+    if (shouldPrint) printBill(bill);
+  } catch (e) { toast(e.message); }
+}
+
+// =====================================================================
+//  CREDIT & DUES
+// =====================================================================
+function renderDues() {
+  if (!$("duBody")) return;
+  const open = dues.filter(d => dueBal(d) > 0);
+  const sum = k => open.filter(d => d.kind === k).reduce((a, d) => a + dueBal(d), 0);
+  $("du_credit").textContent = rs(sum("credit"));
+  $("du_rmv").textContent = rs(sum("rmv"));
+  $("du_cnt").textContent = open.length;
+  const td = today();
+  $("du_today").textContent = rs(dues.flatMap(d => d.payments || []).filter(p => p.date === td).reduce((a, p) => a + (Number(p.amt) || 0), 0));
+  const nb = $("navDuesBadge");
+  if (nb) { nb.textContent = open.length; nb.classList.toggle("hidden", !open.length); }
+
+  const rows = filteredDues();
+  $("duBody").innerHTML = rows.map(d => {
+    const bal = dueBal(d);
+    return `<tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
+      <td class="py-3 px-3"><div class="text-xs mono">${esc(d.date)}</div><div class="mono font-bold text-xs text-[#D90429]">${esc(d.billNo || "")}</div></td>
+      <td class="py-3 px-3"><div class="font-bold">${esc(d.name)}</div><div class="text-[11px] mono text-slate-500">NIC: ${esc(d.nic || "-")}</div><div class="text-[11px] mono text-slate-500">${esc(d.phone || "")}</div></td>
+      <td class="py-3 px-3"><div class="mono text-xs font-semibold">${esc(d.bike || "-")}</div><div class="text-[11px] text-slate-500">${esc(d.model || "")}</div></td>
+      <td class="py-3 px-3"><span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${d.kind === "rmv" ? "bg-amber-500/15 text-amber-700 dark:text-amber-300" : "bg-red-500/15 text-[#D90429]"}">${d.kind === "rmv" ? "RMV DUE" : "CREDIT"}</span><div class="text-[11px] text-slate-500 mt-0.5">${esc(d.note || "")}</div></td>
+      <td class="py-3 px-3 text-right mono text-xs">${rs(d.amount)}</td>
+      <td class="py-3 px-3 text-right mono text-xs text-emerald-600 dark:text-emerald-400">${rs(d.paid || 0)}</td>
+      <td class="py-3 px-3 text-right mono font-extrabold ${bal > 0 ? "text-[#D90429]" : "text-emerald-600"}">${bal > 0 ? rs(bal) : "SETTLED"}</td>
+      <td class="py-3 px-3 text-right whitespace-nowrap space-x-1">
+        ${bal > 0 ? `<button onclick="openDuePay('${d.id}')" class="px-2.5 py-1 rounded-lg bg-[#D90429] text-white text-xs font-bold cursor-pointer">Receive</button>
+        <button onclick="dueWhatsApp('${d.id}')" class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-xs font-bold cursor-pointer">WA</button>` : ""}
+        <button onclick="dueHistory('${d.id}')" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-bold cursor-pointer">History</button>
+        <button onclick="delDue('${d.id}')" class="px-2.5 py-1 rounded-lg bg-red-500/10 text-[#D90429] text-xs font-bold cursor-pointer">Del</button>
+      </td></tr>`;
+  }).join("") || `<tr><td colspan="8" class="py-8 text-center text-slate-500">No dues found.</td></tr>`;
+}
+function filteredDues() {
+  const q = $("du_search").value.toLowerCase().replace(/\s+/g, " ").trim(), k = $("du_kind").value, st = $("du_status").value;
+  return dues.filter(d => {
+    const bal = dueBal(d);
+    if (k && d.kind !== k) return false;
+    if (st === "open" && bal <= 0) return false;
+    if (st === "settled" && bal > 0) return false;
+    return !q || [d.name, d.nic, d.phone, d.bike, d.billNo, d.model].join(" ").toLowerCase().includes(q) ||
+      (normNic(d.nic).includes(normNic(q)) && normNic(q).length >= 3) || (normBike(d.bike).includes(normBike(q)) && normBike(q).length >= 3);
+  });
+}
+function openDuePay(id) {
+  const d = dues.find(x => x.id === id); if (!d) return;
+  $("dp_id").value = id;
+  $("dp_amt").value = dueBal(d);
+  $("dp_info").innerHTML = `<b>${esc(d.name)}</b> • NIC ${esc(d.nic || "-")}<br>${esc(d.bike || d.model || "")} • ${esc(d.billNo || "")}<br>${d.kind === "rmv" ? "RMV due" : "Credit"} balance: <b>${rs(dueBal(d))}</b>`;
+  openModal("duePayModal");
+}
+async function saveDuePay(print) {
+  const id = $("dp_id").value, amt = +$("dp_amt").value, method = $("dp_method").value;
+  const d = dues.find(x => x.id === id);
+  if (!d) return;
+  if (!(amt > 0)) return toast("Enter the amount");
+  if (amt > dueBal(d)) return toast("Amount is more than the balance (" + rs(dueBal(d)) + ")");
+  const pay = { date: today(), amt, method, by: auth.currentUser.email, ts: Date.now() };
+  try {
+    await db.runTransaction(async t => {
+      const r = db.collection("dues").doc(id), snap = await t.get(r);
+      if (!snap.exists) throw new Error("Record not found");
+      const cur = snap.data(), paid = (Number(cur.paid) || 0) + amt;
+      if (paid > Number(cur.amount) + 0.001) throw new Error("Amount exceeds balance");
+      t.update(r, { paid, payments: [...(cur.payments || []), pay], status: paid >= Number(cur.amount) ? "settled" : "open" });
+      if ($("dp_petty").checked && method === "Cash") t.set(db.collection("petty").doc(), { date: today(), type: "in", cat: "Customer dues received", desc: `${d.kind === "rmv" ? "RMV" : "Credit"} payment - ${d.name} ${d.bike || ""}`.trim(), amt, ref: d.billNo || "", by: auth.currentUser.email, created: Date.now() });
+    });
+    closeModal("duePayModal");
+    toast("Payment received: " + rs(amt));
+    if (print) printDueReceipt(d, pay, dueBal(d) - amt);
+  } catch (e) { toast(e.message); }
+}
+function printDueReceipt(d, pay, balAfter) {
+  const txt = `${SHOP.name} | Tel ${SHOP.phone}\nPayment received ${pay.date}\nBill: ${d.billNo || "-"}\nCustomer: ${d.name} | NIC ${d.nic || "-"}\nBike: ${d.bike || d.model || "-"}\n${d.kind === "rmv" ? "RMV" : "Credit"} paid: ${rs(pay.amt)}\nBalance: ${rs(balAfter)}`;
+  const qr = makeQR(txt);
+  $("receipt").innerHTML = `
+    <div style="text-align:center"><b style="font-size:19px;letter-spacing:1px">${SHOP.name}</b><br>Authorized Sales &amp; Service<br><b>Tel: ${SHOP.phone}</b><br>------------------------------<br><b>PAYMENT RECEIPT</b></div>
+    Date: ${esc(pay.date)}<br>
+    Bill: <b>${esc(d.billNo || "-")}</b><br>
+    Customer: ${esc(d.name)}<br>
+    ${d.nic ? `NIC: ${esc(d.nic)}<br>` : ""}${d.phone ? `Tel: ${esc(d.phone)}<br>` : ""}
+    ${d.bike ? `Bike No: <b>${esc(d.bike)}</b><br>` : ""}${d.model ? `Model: ${esc(d.model)}<br>` : ""}
+    For: ${d.kind === "rmv" ? "RMV fee" : "Credit balance"}<br>
+    Via: ${esc(pay.method)}<br>
+    ------------------------------
+    <div style="font-size:15px;font-weight:bold;margin:4px 0">PAID: ${rs(pay.amt)}</div>
+    Total due was: ${rs(d.amount)}<br>
+    Balance now: <b>${rs(Math.max(0, balAfter))}</b>
+    <br>------------------------------
+    ${qr ? `<div style="text-align:center;margin-top:6px"><img src="${qr}" style="width:120px;height:120px"></div>` : ""}
+    <div style="text-align:center;margin-top:8px">Thank you!</div>`;
+  setTimeout(() => window.print(), 200);
+}
+function dueHistory(id) {
+  const d = dues.find(x => x.id === id); if (!d) return;
+  $("bdTitle").textContent = `${d.name} • ${d.kind === "rmv" ? "RMV due" : "Credit"}`;
+  $("bdContent").innerHTML = `
+    <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/70 text-xs space-y-1">
+      <div>NIC: <b>${esc(d.nic || "-")}</b> • Tel: <b>${esc(d.phone || "-")}</b></div>
+      <div>Bike: <b>${esc(d.bike || "-")}</b> ${esc(d.model || "")} • Bill: <b>${esc(d.billNo || "")}</b></div>
+      <div>Amount: <b>${rs(d.amount)}</b> • Paid: <b>${rs(d.paid || 0)}</b> • Balance: <b>${rs(dueBal(d))}</b></div>
+    </div>
+    <div class="divide-y divide-slate-100 dark:divide-slate-800 max-h-60 overflow-y-auto">
+      ${(d.payments || []).map(p => `<div class="py-2 flex justify-between text-xs"><span>${esc(p.date)} • ${esc(p.method)}</span><b class="mono">${rs(p.amt)}</b></div>`).join("") || `<div class="py-4 text-center text-xs text-slate-400">No payments yet.</div>`}
+    </div>`;
+  $("bdActions").innerHTML = `<button onclick="closeModal('billDetailModal')" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold cursor-pointer">Close</button>`;
+  openModal("billDetailModal");
+}
+function dueWhatsApp(id) {
+  const d = dues.find(x => x.id === id); if (!d) return;
+  const text = `Dear *${d.name}*, this is a reminder from *${SHOP.name}* (Tel ${SHOP.phone}). Your pending ${d.kind === "rmv" ? "RMV fee" : "balance payment"} for ${d.bike || d.model || "your bike"} (${d.billNo || ""}) is *${rs(dueBal(d))}*. Please settle at your earliest convenience. Thank you!`;
+  const ph = formatSriLankaPhone(d.phone);
+  window.open(ph ? `https://wa.me/${ph}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+}
+function delDue(id) {
+  const d = dues.find(x => x.id === id); if (!d) return;
+  askConfirm({ title: "Delete this due record?", message: `${d.name} - ${rs(d.amount)} (${d.billNo || ""}) will be removed permanently.`, onConfirm: async () => { await db.collection("dues").doc(id).delete(); toast("Record deleted"); } });
+}
+function xDues() {
+  dl("Credit_and_Dues", filteredDues().map(d => ({ Date: d.date, Bill: d.billNo || "", Customer: d.name, NIC: d.nic || "", Phone: d.phone || "", Bike: d.bike || "", Model: d.model || "", Type: d.kind === "rmv" ? "RMV due" : "Credit", Note: d.note || "", Amount: d.amount, Paid: d.paid || 0, Balance: dueBal(d), Status: dueBal(d) > 0 ? "Open" : "Settled" })));
+}
+
 // Initialize Theme & Icons on Boot
 initTheme();
 fillLists();
+renderBS();
 lucide.createIcons();
 </script>
 </body>
