@@ -111,8 +111,8 @@
     </div>
 
     <div class="relative z-10 my-10 lg:my-0">
-      <div class="w-28 h-28 lg:w-36 lg:h-36 bg-white rounded-2xl p-2 shadow-2xl mb-6 flex items-center justify-center ring-4 ring-white/10">
-        <img class="lg w-full h-full object-contain rounded-xl" alt="Anuradha TVS Logo">
+      <div class="w-32 h-32 lg:w-40 lg:h-40 bg-white rounded-2xl p-2 shadow-2xl mb-6 flex items-center justify-center ring-4 ring-white/15 overflow-hidden">
+        <img class="lg w-full h-full object-contain rounded-xl drop-shadow-sm" alt="Anuradh Motors Logo">
       </div>
       <h1 class="text-3xl lg:text-5xl font-extrabold tracking-tight leading-tight">
         ANURADHA <span class="text-[#EF233C]">TVS</span>
@@ -240,8 +240,8 @@
     <!-- Brand Header -->
     <div class="p-5 border-b border-slate-800/90 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-11 h-11 bg-white rounded-xl p-1 flex items-center justify-center shadow-md shrink-0">
-          <img class="lg w-full h-full object-contain rounded-lg" alt="Logo">
+        <div class="w-11 h-11 bg-white rounded-xl p-1 flex items-center justify-center shadow-md ring-1 ring-white/20 shrink-0 overflow-hidden">
+          <img class="lg w-full h-full object-contain rounded-lg" alt="Anuradh Motors Logo">
         </div>
         <div>
           <div class="font-extrabold text-base tracking-tight leading-none">ANURADHA <span class="text-[#EF233C]">TVS</span></div>
@@ -1856,7 +1856,9 @@ function shareCartWhatsApp() {
 function printBill(b) {
   $("receipt").innerHTML = `
     <div style="text-align:center">
-      <img src="${LOGO}" style="width:85px;height:85px;object-fit:contain"><br>
+      <div style="display:inline-block;background:#fff;padding:4px;border-radius:10px;margin-bottom:4px">
+        <img src="${LOGO}" style="width:92px;height:92px;object-fit:contain;border-radius:8px">
+      </div><br>
       <b style="font-size:17px">ANURADHA TVS</b><br>
       Authorized Sales &amp; Service<br>
       ------------------------------
