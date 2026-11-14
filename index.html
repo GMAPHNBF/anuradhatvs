@@ -82,7 +82,10 @@
 
   /* Thermal Receipt Print Styling (80mm Crisp Output) */
   #receipt { display: none; }
+  @page { size: 80mm auto; margin: 0; }
+  @page payslip { size: A4; margin: 12mm; }
   @media print {
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     body > *:not(#receipt) { display: none !important; }
     html, body { background: #fff !important; color: #000 !important; margin: 0 !important; padding: 0 !important; }
     #receipt {
@@ -95,6 +98,7 @@
       line-height: 1.4;
       color: #000;
     }
+    #receipt.wide { width: 100% !important; max-width: 190mm; page: payslip; font-size: 12px; padding: 0; }
     #receipt td, #receipt th { border: 0; padding: 2px 0; }
   }
 </style>
@@ -290,6 +294,20 @@
       <button data-t="dues" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer">
         <span class="flex items-center gap-3"><i data-lucide="hand-coins" class="w-4 h-4"></i> Credit &amp; Dues</span>
         <span id="navDuesBadge" class="hidden px-2 py-0.5 text-[11px] font-mono font-bold rounded-full bg-amber-500/20 text-amber-300">0</span>
+      </button>
+
+      <div class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Staff &amp; Payroll</div>
+
+      <button data-t="emp" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer">
+        <span class="flex items-center gap-3"><i data-lucide="users" class="w-4 h-4"></i> Employees</span>
+      </button>
+
+      <button data-t="att" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer">
+        <span class="flex items-center gap-3"><i data-lucide="calendar-check" class="w-4 h-4"></i> Attendance</span>
+      </button>
+
+      <button data-t="payroll" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer">
+        <span class="flex items-center gap-3"><i data-lucide="banknote" class="w-4 h-4"></i> Payroll &amp; Salary</span>
       </button>
 
       <div class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Records &amp; Insights</div>
@@ -1139,6 +1157,138 @@
         </div>
       </section>
 
+      <!-- ==================== 10. EMPLOYEES ==================== -->
+      <section id="emp" class="tab-section space-y-6">
+        <div id="em_form" class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <h3 id="em_title" class="font-bold text-base text-slate-900 dark:text-white">Add Employee</h3>
+            <button onclick="resetEmpForm()" class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold cursor-pointer">Clear / Cancel Edit</button>
+          </div>
+          <input type="hidden" id="em_id">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class=""><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Full Name *</label><input id="em_name" placeholder="Employee name"  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none "></div>
+            <div class=""><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">NIC No</label><input id="em_nic" placeholder=""  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono uppercase"></div>
+            <div class=""><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Phone / TP</label><input id="em_phone" placeholder="07X XXX XXXX"  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono"></div>
+            <div class=""><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Designation</label><div class="flex gap-1.5"><select id="em_desig" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></select><button type="button" title="Add designation" onclick="openListModal('designations')" class="px-3 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-sm font-extrabold cursor-pointer">+</button></div></div>
+            <div class="sm:col-span-2"><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Address</label><input id="em_addr" placeholder=""  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none "></div>
+            <div class=""><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Date Joined</label><input id="em_join" type="date" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></div>
+            <div class=""><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Status</label><select id="em_status" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"><option>Active</option><option>Left</option></select></div>
+            <div class=""><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Basic Salary (Rs) *</label><input id="em_basic" type="number" min="0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right"></div>
+            <div class=""><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">EPF-able Allowance (Rs)</label><input id="em_allowEpf" type="number" min="0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right" placeholder="e.g. BRA / COLA"></div>
+            <div class=""><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Other Allowance (Rs)</label><input id="em_allowOther" type="number" min="0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right" placeholder="Travel etc. (no EPF)"></div>
+            <div class=""><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">EPF Member No</label><input id="em_epfNo" placeholder=""  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono"></div>
+            <div class=""><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">ETF Member No</label><input id="em_etfNo" placeholder=""  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono"></div>
+            <div class="sm:col-span-2"><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Bank / Account No</label><input id="em_bank" placeholder="Bank - Account number"  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none "></div>
+            <div class="sm:col-span-2"><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Emergency Contact</label><input id="em_emerg" placeholder="Name - phone"  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none "></div>
+            <div class="sm:col-span-2 flex flex-wrap items-center gap-5">
+              <label class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer"><input type="checkbox" id="em_epfOn" checked class="rounded"> EPF / ETF applicable</label>
+              <label class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer"><input type="checkbox" id="em_otOn" checked class="rounded"> Overtime eligible</label>
+            </div>
+            <div class="sm:col-span-2 flex items-end justify-end"><button onclick="saveEmployee()" id="em_saveBtn" class="px-6 py-2.5 rounded-xl bg-[#D90429] hover:bg-[#B00321] text-white font-bold text-sm cursor-pointer">Save Employee</button></div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">Employee List</h3>
+            <div class="flex flex-wrap items-center gap-2">
+              <input id="em_search" oninput="renderEmps()" placeholder="Search name / NIC / EPF..." class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:outline-none">
+              <select id="em_fStatus" onchange="renderEmps()" class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-xs focus:outline-none"><option value="Active">Active</option><option value="Left">Left</option><option value="">All</option></select>
+              <button onclick="xEmps()" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer">Excel</button>
+            </div>
+          </div>
+          <div class="overflow-x-auto"><table class="w-full text-left border-collapse">
+            <thead><tr class="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-50/70 dark:bg-slate-900/50"><th class="py-3 px-3">Code</th><th class="py-3 px-3">Employee</th><th class="py-3 px-3">Designation</th><th class="py-3 px-3">EPF / ETF No</th><th class="py-3 px-3 text-right">Basic</th><th class="py-3 px-3 text-right">Allowances</th><th class="py-3 px-3">Status</th><th class="py-3 px-3 text-right">Actions</th></tr></thead>
+            <tbody id="emBody" class="divide-y divide-slate-100 dark:divide-slate-800/80 text-sm"></tbody>
+          </table></div>
+        </div>
+
+        <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <h3 class="font-bold text-base text-slate-900 dark:text-white mb-3">Salary Advances / Loans</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+            <div class="lg:col-span-2"><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Employee</label><select id="adv_emp" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></select></div>
+            <div class=""><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Date</label><input id="adv_date" type="date" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></div>
+            <div class=""><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Amount (Rs)</label><input id="adv_amt" type="number" min="0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right"></div>
+            <div class=""><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Monthly Deduction (Rs)</label><input id="adv_monthly" type="number" min="0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right" placeholder="Blank = all at once"></div>
+            <div class=""><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Note</label><input id="adv_note" placeholder=""  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none "></div>
+            <div class="lg:col-span-4 flex items-center"><label class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer"><input type="checkbox" id="adv_petty" checked class="rounded"> Record in Petty Cash (Out)</label></div>
+            <div class="lg:col-span-2 flex items-end justify-end"><button onclick="addAdvance()" class="px-6 py-2.5 rounded-xl bg-[#14213D] hover:bg-slate-800 text-white font-bold text-sm cursor-pointer">Give Advance</button></div>
+          </div>
+          <div class="overflow-x-auto mt-4"><table class="w-full text-left border-collapse">
+            <thead><tr class="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-50/70 dark:bg-slate-900/50"><th class="py-3 px-3">Date</th><th class="py-3 px-3">Employee</th><th class="py-3 px-3 text-right">Amount</th><th class="py-3 px-3 text-right">Monthly</th><th class="py-3 px-3 text-right">Repaid</th><th class="py-3 px-3 text-right">Balance</th><th class="py-3 px-3">Note</th><th class="py-3 px-3"></th></tr></thead>
+            <tbody id="advBody" class="divide-y divide-slate-100 dark:divide-slate-800/80 text-sm"></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ==================== 11. ATTENDANCE ==================== -->
+      <section id="att" class="tab-section space-y-6">
+        <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div class="flex items-center gap-3">
+              <h3 class="font-bold text-base text-slate-900 dark:text-white">Daily Attendance</h3>
+              <input id="at_date" type="date" onchange="atDirty=false;renderAttendance()" class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-xs focus:outline-none">
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="markAllPresent()" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold cursor-pointer">Mark All Present</button>
+              <button onclick="saveAttendance()" class="px-5 py-2 rounded-xl bg-[#D90429] hover:bg-[#B00321] text-white text-xs font-bold cursor-pointer">Save Attendance</button>
+            </div>
+          </div>
+          <div class="overflow-x-auto"><table class="w-full text-left border-collapse">
+            <thead><tr class="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-50/70 dark:bg-slate-900/50"><th class="py-3 px-3">Employee</th><th class="py-3 px-3">Status</th><th class="py-3 px-3">In</th><th class="py-3 px-3">Out</th><th class="py-3 px-3">OT Hours</th><th class="py-3 px-3">Note</th></tr></thead>
+            <tbody id="atBody" oninput="atDirty=true" onchange="atDirty=true" class="divide-y divide-slate-100 dark:divide-slate-800/80 text-sm"></tbody>
+          </table></div>
+        </div>
+        <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <h3 id="atSumTitle" class="font-bold text-base text-slate-900 dark:text-white mb-3">Monthly Summary</h3>
+          <div class="overflow-x-auto"><table class="w-full text-left border-collapse">
+            <thead><tr class="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-50/70 dark:bg-slate-900/50"><th class="py-3 px-3">Employee</th><th class="py-3 px-3 text-center">Present</th><th class="py-3 px-3 text-center">Half Day</th><th class="py-3 px-3 text-center">Absent</th><th class="py-3 px-3 text-center">Paid Leave</th><th class="py-3 px-3 text-center">No-Pay Leave</th><th class="py-3 px-3 text-center">OT Hrs</th><th class="py-3 px-3 text-center">Days Marked</th></tr></thead>
+            <tbody id="atSumBody" class="divide-y divide-slate-100 dark:divide-slate-800/80 text-sm"></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ==================== 12. PAYROLL ==================== -->
+      <section id="payroll" class="tab-section space-y-6">
+        <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-sm uppercase tracking-wider text-slate-700 dark:text-slate-300">Payroll Rules</h3>
+            <button onclick="savePaySettings()" class="px-4 py-1.5 rounded-xl bg-[#14213D] text-white text-xs font-bold cursor-pointer">Save Rules</button>
+          </div>
+          <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
+            <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">EPF Employee %</label><input id="ps_epfEmp" type="number" step="any" min="0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right" value="8"></div><div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">EPF Employer %</label><input id="ps_epfEr" type="number" step="any" min="0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right" value="12"></div><div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">ETF Employer %</label><input id="ps_etf" type="number" step="any" min="0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right" value="3"></div>
+            <div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">No-pay day = salary / days</label><input id="ps_noPayDiv" type="number" step="any" min="0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right" value="30"></div><div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">OT hourly = basic / hours</label><input id="ps_otDiv" type="number" step="any" min="0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right" value="240"></div><div><label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">OT multiplier</label><input id="ps_otMul" type="number" step="any" min="0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mono text-right" value="1.5"></div>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-2">Defaults follow the usual Sri Lanka rates (EPF 8% + 12%, ETF 3%, OT at 1.5x of basic/240). Confirm with your accountant. APIT / income tax is entered manually per employee.</p>
+        </div>
+
+        <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <h3 class="font-bold text-base text-slate-900 dark:text-white">Monthly Salary Sheet</h3>
+              <input id="pr_month" type="month" onchange="prDirty=false;initPayroll()" class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-xs focus:outline-none">
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="savePayroll()" class="px-4 py-2 rounded-xl bg-[#14213D] hover:bg-slate-800 text-white text-xs font-bold cursor-pointer">Save Payroll</button>
+              <button onclick="markAllPaid()" class="px-4 py-2 rounded-xl bg-[#D90429] hover:bg-[#B00321] text-white text-xs font-bold cursor-pointer">Mark All Paid</button>
+              <button onclick="xPayroll()" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer">Salary Excel</button>
+              <button onclick="xEpf()" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer">EPF / ETF Excel</button>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mt-4" id="prCards"></div>
+          <div class="overflow-x-auto mt-4"><table class="w-full text-left border-collapse text-xs">
+            <thead><tr class="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-50/70 dark:bg-slate-900/50">
+              <th class="py-3 px-2">Employee</th><th class="py-3 px-2 text-right">Basic + Allow.</th><th class="py-3 px-2 text-center">P / H / A / NP</th><th class="py-3 px-2 text-right">No-pay (-)</th><th class="py-3 px-2 text-right">OT</th>
+              <th class="py-3 px-2 text-right">Commission</th><th class="py-3 px-2 text-right">Bonus</th><th class="py-3 px-2 text-right">Other (+)</th><th class="py-3 px-2 text-right">Gross</th>
+              <th class="py-3 px-2 text-right">EPF (emp)</th><th class="py-3 px-2 text-right">Advance</th><th class="py-3 px-2 text-right">Other (-)</th><th class="py-3 px-2 text-right">APIT</th><th class="py-3 px-2 text-right">Net Salary</th><th class="py-3 px-2 text-right">Actions</th>
+            </tr></thead>
+            <tbody id="prBody" class="divide-y divide-slate-100 dark:divide-slate-800/80"></tbody>
+            <tfoot id="prFoot"></tfoot>
+          </table></div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-3">Absent = 1 day, Half Day = 0.5, No-Pay Leave = 1 deducted from basic + EPF-able allowance. EPF / ETF is calculated on basic + EPF-able allowance after no-pay (OT, bonus and other allowances are excluded).</p>
+        </div>
+      </section>
+
     </main>
   </div>
 </div>
@@ -1353,6 +1503,9 @@ const PAGE_META = {
   bills: ["Bill History Archive", "Search past invoices, reprint receipts or void transactions"],
   reports: ["Analytics & Excel Reports", "Financial summaries, top selling parts & XLSX exports"],
   petty: ["Petty Cash", "Office cash in / out book with running balance"],
+  emp: ["Employees", "Staff records, EPF / ETF numbers, salaries and advances"],
+  att: ["Attendance", "Daily attendance, leave and overtime for every employee"],
+  payroll: ["Payroll & Salary", "Monthly salary, EPF / ETF, advances and payslips"],
   bikesale: ["Brand New Bike Sale", "Cash or leasing sale, RMV, down payment & customer credit"],
   dues: ["Credit & Dues", "Customers who owe credit or RMV fees - search by NIC, collect later"]
 };
@@ -1379,6 +1532,9 @@ function switchTab(t) {
   if (t === "petty") renderPetty();
   if (t === "dues") renderDues();
   if (t === "bikesale") renderBS();
+  if (t === "emp") renderEmps();
+  if (t === "att") renderAttendance();
+  if (t === "payroll") initPayroll();
 }
 
 function toggleMenu(f) {
@@ -1418,6 +1574,7 @@ async function register() {
 
 auth.onAuthStateChanged(u => {
   unsubs.forEach(f => f()); unsubs = [];
+  if (attUnsub) { attUnsub(); attUnsub = null; } attMonth = ""; attRows = [];
   $("auth").style.display = u ? "none" : "flex";
   $("app").style.display = u ? "flex" : "none";
   if (!u) return;
@@ -1465,6 +1622,7 @@ auth.onAuthStateChanged(u => {
       if (Array.isArray(v.services) && v.services.length) lists.services = v.services;
       if (Array.isArray(v.cats) && v.cats.length) lists.cats = v.cats;
       if (Array.isArray(v.companies) && v.companies.length) lists.companies = v.companies;
+      if (Array.isArray(v.designations) && v.designations.length) lists.designations = v.designations;
     }
     fillLists();
   }, () => fillLists()));
@@ -1474,7 +1632,28 @@ auth.onAuthStateChanged(u => {
     renderDues();
   }, e => toast("Dues: " + e.message)));
 
+  unsubs.push(db.collection("employees").limit(300).onSnapshot(sn => {
+    emps = sn.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.code || "").localeCompare(b.code || ""));
+    fillEmpSelects(); refreshStaff();
+  }, e => toast("Employees: " + e.message)));
+  unsubs.push(db.collection("advances").limit(500).onSnapshot(sn => {
+    advs = sn.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.created || 0) - (a.created || 0));
+    refreshStaff();
+  }, e => toast("Advances: " + e.message)));
+  unsubs.push(db.collection("payroll").limit(1500).onSnapshot(sn => {
+    pays = sn.docs.map(d => ({ id: d.id, ...d.data() }));
+    refreshStaff();
+  }, e => toast("Payroll: " + e.message)));
+  unsubs.push(db.doc("meta/payroll").onSnapshot(d => {
+    if (d.exists) paySet = { ...paySet, ...d.data() };
+    fillPaySettings(); refreshStaff();
+  }, () => {}));
+
   $("pc_date").value = today();
+  $("at_date").value = today();
+  $("pr_month").value = today().slice(0, 7);
+  $("em_join").value = today();
+  $("adv_date").value = today();
   if (!$("bs_staff").value) $("bs_staff").value = u.displayName || u.email;
   fillLists();
   lucide.createIcons();
@@ -2457,6 +2636,7 @@ const SHOP = { name: "ANURADHA TVS", phone: "0777172740" };
 const lists = {
   models: ["TVS Apache RTR 160","TVS Apache RTR 160 4V","TVS Apache RTR 180","TVS Apache RTR 200 4V","TVS Apache RR 310","TVS Raider 125","TVS Ntorq 125","TVS Jupiter 110","TVS Jupiter 125","TVS Star City+","TVS HLX 125","TVS XL100","TVS Scooty Pep+","TVS Scooty Zest","TVS iQube (Electric)","TVS King (3-Wheeler)","Other"],
   cats: ["Opening float / top-up","Cash from sales","Customer dues received","Other income","RMV fee","Leasing doc charge","Fuel","Tea / meals","Transport","Stationery","Electricity / water / bills","Staff advance","Repairs / maintenance","Other expense"],
+  designations: ["Manager","Cashier","Sales Executive","Mechanic","Helper","Accountant","Security","Cleaner","Other"],
   companies: ["LOLC Finance","Singer Finance (Lanka)","People's Leasing & Finance","Commercial Credit & Finance","Sampath Bank (Leasing)","HNB Finance","Central Finance","Senkadagala Finance","Orient Finance","Mercantile Investments","Softlogic Finance","Siyapatha Finance","Nations Trust Bank","Alliance Finance","Janashakthi Finance","Richard Pieris Finance","Vallibel Finance","Abans Finance","MBSL Finance","ETI Finance","Other"],
   services: ["Full service","1st free service","2nd free service","3rd free service","Oil change","Brake repair","Engine repair","Electrical","Tyre / puncture","Chain & sprocket","Clutch repair","Suspension repair","Washing","Other"]
 };
@@ -2469,7 +2649,7 @@ function setSel(id, val) {
   el.value = val;
 }
 function fillLists() {
-  [["c_model", "models"], ["s_model", "models"], ["c_svc", "services"], ["s_type", "services"], ["pc_cat", "cats"], ["bs_model", "models", 1], ["bs_company", "companies", 1]].forEach(([id, k, blank]) => {
+  [["c_model", "models"], ["s_model", "models"], ["c_svc", "services"], ["s_type", "services"], ["pc_cat", "cats"], ["bs_model", "models", 1], ["bs_company", "companies", 1], ["em_desig", "designations"]].forEach(([id, k, blank]) => {
     const el = $(id); if (!el) return;
     const cur = el.value;
     el.innerHTML = (blank ? '<option value="">-- select --</option>' : "") + lists[k].map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
@@ -2479,7 +2659,7 @@ function fillLists() {
 }
 function openListModal(kind) {
   listKind = kind;
-  $("lmTitle").textContent = { models: "Add TVS / Bike Model", services: "Add Service Type", cats: "Add Petty Cash Category", companies: "Add Leasing Company" }[kind];
+  $("lmTitle").textContent = { models: "Add TVS / Bike Model", services: "Add Service Type", cats: "Add Petty Cash Category", companies: "Add Leasing Company", designations: "Add Designation" }[kind];
   $("lmInput").value = "";
   renderListChips();
   openModal("listModal");
@@ -2491,7 +2671,7 @@ function renderListChips() {
       <button onclick="removeListItem(${i})" title="Remove" class="text-slate-400 hover:text-[#D90429] cursor-pointer">&times;</button></span>`).join("");
 }
 async function persistLists() {
-  try { await db.doc("meta/lists").set({ models: lists.models, services: lists.services, cats: lists.cats, companies: lists.companies }, { merge: true }); }
+  try { await db.doc("meta/lists").set({ models: lists.models, services: lists.services, cats: lists.cats, companies: lists.companies, designations: lists.designations }, { merge: true }); }
   catch (e) { toast("Saved on this screen only: " + e.message); }
 }
 async function saveListItem() {
@@ -2657,42 +2837,6 @@ function buildWhatsAppBillText(b) {
   const linesTxt = (b.lines || []).map(l => `• ${l.name} (${l.qty} x ${Number(l.price).toFixed(2)}) = Rs ${(l.qty * l.price).toFixed(2)}`).join("\n");
   const sale = saleRows(b).map(([k, v]) => `${k}: ${v}`).join("\n");
   return `*${SHOP.name} — Sales & Service*\nTel: ${SHOP.phone}\nInvoice: *${b.no}*\nDate: ${b.date}\nCustomer: ${b.name}${b.bike ? `\nBike: ${b.bike}` : ""}${b.model ? `\nModel: ${b.model}` : ""}${b.svcType ? `\nService: ${b.svcType}` : ""}${b.staff ? `\nServed by: ${b.staff}` : ""}\n----------------------\n${linesTxt}\n----------------------${b.disc ? `\nDiscount: Rs ${Number(b.disc).toFixed(2)}` : ""}\n*TOTAL: ${rs(b.total)}*\nPayment: ${b.payMethod || "Cash"}${sale ? "\n----------------------\n" + sale : ""}\n\nThank you for choosing ${SHOP.name}!`;
-}
-function printBill(b) {
-  if (!b) return;
-  const qr = makeQR(billPlainText(b));
-  $("receipt").innerHTML = `
-    <div style="text-align:center">
-      <b style="font-size:19px;letter-spacing:1px">${SHOP.name}</b><br>
-      Authorized Sales &amp; Service<br>
-      <b>Tel: ${SHOP.phone}</b><br>
-      ------------------------------
-    </div>
-    Bill: <b>${esc(b.no)}</b><br>
-    Date: ${esc(b.date)}<br>
-    Customer: ${esc(b.name)}<br>
-    ${b.phone ? `Tel: ${esc(b.phone)}<br>` : ""}
-    ${b.bike ? `Bike No: <b>${esc(b.bike)}</b><br>` : ""}
-    ${b.model ? `Model: ${esc(b.model)}<br>` : ""}
-    ${b.svcType ? `Service: ${esc(b.svcType)}<br>` : ""}
-    Pay Mode: ${esc(b.payMethod || "Cash")}<br>
-    ${b.staff ? `Served by: ${esc(b.staff)}<br>` : ""}
-    ------------------------------
-    <table style="width:100%">
-      ${(b.lines || []).map(l => `
-        <tr><td colspan="3"><b>${esc(l.name)}</b></td></tr>
-        <tr><td>${l.qty} x ${Number(l.price).toFixed(2)}</td><td></td><td style="text-align:right">${(l.qty * l.price).toFixed(2)}</td></tr>
-      `).join("")}
-    </table>
-    ------------------------------<br>
-    ${b.disc ? `Discount: -${Number(b.disc).toFixed(2)}<br>` : ""}
-    <div style="font-size:15px;font-weight:bold;margin:4px 0">TOTAL: ${rs(b.total)}</div>
-    ${b.sale ? `------------------------------<table style="width:100%">${saleRows(b).map(([k, v]) => `<tr><td style="vertical-align:top">${esc(k)}</td><td style="text-align:right">${esc(v)}</td></tr>`).join("")}</table>` : ""}
-    ------------------------------
-    ${qr ? `<div style="text-align:center;margin-top:6px"><img src="${qr}" style="width:130px;height:130px"><br><span style="font-size:10px">Scan for bill details</span></div>` : ""}
-    <div style="text-align:center;margin-top:8px">Thank you! Ride Safe with TVS.</div>
-  `;
-  setTimeout(() => window.print(), 200);
 }
 function viewBillDetail(id) {
   const b = bills.find(x => x.id === id);
@@ -2979,27 +3123,6 @@ async function saveDuePay(print) {
     if (print) printDueReceipt(d, pay, dueBal(d) - amt);
   } catch (e) { toast(e.message); }
 }
-function printDueReceipt(d, pay, balAfter) {
-  const txt = `${SHOP.name} | Tel ${SHOP.phone}\nPayment received ${pay.date}\nBill: ${d.billNo || "-"}\nCustomer: ${d.name} | NIC ${d.nic || "-"}\nBike: ${d.bike || d.model || "-"}\n${d.kind === "rmv" ? "RMV" : "Credit"} paid: ${rs(pay.amt)}\nBalance: ${rs(balAfter)}`;
-  const qr = makeQR(txt);
-  $("receipt").innerHTML = `
-    <div style="text-align:center"><b style="font-size:19px;letter-spacing:1px">${SHOP.name}</b><br>Authorized Sales &amp; Service<br><b>Tel: ${SHOP.phone}</b><br>------------------------------<br><b>PAYMENT RECEIPT</b></div>
-    Date: ${esc(pay.date)}<br>
-    Bill: <b>${esc(d.billNo || "-")}</b><br>
-    Customer: ${esc(d.name)}<br>
-    ${d.nic ? `NIC: ${esc(d.nic)}<br>` : ""}${d.phone ? `Tel: ${esc(d.phone)}<br>` : ""}
-    ${d.bike ? `Bike No: <b>${esc(d.bike)}</b><br>` : ""}${d.model ? `Model: ${esc(d.model)}<br>` : ""}
-    For: ${d.kind === "rmv" ? "RMV fee" : "Credit balance"}<br>
-    Via: ${esc(pay.method)}<br>
-    ------------------------------
-    <div style="font-size:15px;font-weight:bold;margin:4px 0">PAID: ${rs(pay.amt)}</div>
-    Total due was: ${rs(d.amount)}<br>
-    Balance now: <b>${rs(Math.max(0, balAfter))}</b>
-    <br>------------------------------
-    ${qr ? `<div style="text-align:center;margin-top:6px"><img src="${qr}" style="width:120px;height:120px"></div>` : ""}
-    <div style="text-align:center;margin-top:8px">Thank you!</div>`;
-  setTimeout(() => window.print(), 200);
-}
 function dueHistory(id) {
   const d = dues.find(x => x.id === id); if (!d) return;
   $("bdTitle").textContent = `${d.name} • ${d.kind === "rmv" ? "RMV due" : "Credit"}`;
@@ -3027,6 +3150,490 @@ function delDue(id) {
 }
 function xDues() {
   dl("Credit_and_Dues", filteredDues().map(d => ({ Date: d.date, Bill: d.billNo || "", Customer: d.name, NIC: d.nic || "", Phone: d.phone || "", Bike: d.bike || "", Model: d.model || "", Type: d.kind === "rmv" ? "RMV due" : "Credit", Note: d.note || "", Amount: d.amount, Paid: d.paid || 0, Balance: dueBal(d), Status: dueBal(d) > 0 ? "Open" : "Settled" })));
+}
+
+// =====================================================================
+//  PRETTY 80mm RECEIPT LAYOUT
+// =====================================================================
+const RC_FONT = "'Plus Jakarta Sans', Arial, Helvetica, sans-serif";
+const RC_SEP = '<div style="border-top:1px dashed #000;margin:7px 0"></div>';
+const RC_SEP2 = '<div style="border-top:2px solid #000;margin:7px 0"></div>';
+const rcRow = (a, b, strong) => `<tr><td style="padding:1.5px 0;vertical-align:top;color:#222;white-space:nowrap;padding-right:8px">${a}</td><td style="padding:1.5px 0;text-align:right;vertical-align:top;${strong ? "font-weight:800" : "font-weight:600"}">${b}</td></tr>`;
+const rcSection = t => `<div style="text-align:center;font-size:10px;font-weight:800;letter-spacing:2px;margin:2px 0 4px">&mdash;&nbsp;${t}&nbsp;&mdash;</div>`;
+function rcHead(title) {
+  return `
+    <div style="text-align:center">
+      <img src="${LOGO}" style="width:64px;height:64px;object-fit:contain;border-radius:8px"><br>
+      <div style="font-size:21px;font-weight:800;letter-spacing:2px;line-height:1.1;margin-top:2px">${SHOP.name}</div>
+      <div style="font-size:10px;letter-spacing:1.5px;font-weight:600">AUTHORIZED SALES &amp; SERVICE</div>
+      <div style="font-size:13px;font-weight:800;margin-top:2px">Tel: ${SHOP.phone}</div>
+    </div>
+    ${RC_SEP2}
+    <div style="text-align:center;font-size:13px;font-weight:800;letter-spacing:3px;margin-bottom:5px">${title}</div>`;
+}
+function rcFoot(qr, note) {
+  return `${RC_SEP}
+    ${qr ? `<div style="text-align:center"><img src="${qr}" style="width:120px;height:120px"><div style="font-size:9px;letter-spacing:1px;margin-top:1px">SCAN FOR BILL DETAILS</div></div>` : ""}
+    <div style="text-align:center;margin-top:7px;font-size:12px;font-weight:800">${note || "Thank you! Ride Safe with TVS."}</div>
+    <div style="text-align:center;font-size:9px;margin-top:2px">${SHOP.name} &bull; ${SHOP.phone}</div>
+    <div style="height:14px"></div>`;
+}
+function rcPrint(wide) {
+  $("receipt").className = wide ? "wide" : "";
+  const waits = [...$("receipt").querySelectorAll("img")].filter(i => !i.complete).map(i => new Promise(r => { i.onload = i.onerror = r; }));
+  Promise.all(waits).then(() => setTimeout(() => window.print(), 150));
+}
+function printBill(b) {
+  if (!b) return;
+  const qr = makeQR(billPlainText(b));
+  const subtotal = (b.lines || []).reduce((a, l) => a + l.qty * l.price, 0);
+  const meta = [["Bill No", `<b>${esc(b.no)}</b>`], ["Date", esc(b.date)], ["Customer", esc(b.name)]];
+  if (b.phone) meta.push(["Tel", esc(b.phone)]);
+  if (b.bike) meta.push(["Bike No", `<b>${esc(b.bike)}</b>`]);
+  if (b.model) meta.push(["Model", esc(b.model)]);
+  if (b.svcType) meta.push(["Service", esc(b.svcType)]);
+  if (b.staff) meta.push(["Served by", esc(b.staff)]);
+  meta.push(["Payment", esc(b.payMethod || "Cash")]);
+  const sale = saleRows(b);
+  const credit = b.sale && b.sale.creditBal > 0 ? b.sale.creditBal : 0;
+  $("receipt").innerHTML = `<div style="font-family:${RC_FONT};font-size:12px;line-height:1.45;color:#000">
+    ${rcHead(b.type === "bike" ? "BIKE SALE INVOICE" : "INVOICE")}
+    <table style="width:100%;border-collapse:collapse">${meta.map(([a, v]) => rcRow(a, v)).join("")}</table>
+    ${RC_SEP}
+    <table style="width:100%;border-collapse:collapse">
+      <tr style="font-size:10px;letter-spacing:1px;font-weight:800;border-bottom:1px solid #000"><td style="padding:2px 0">ITEM</td><td style="text-align:right;padding:2px 0">AMOUNT (Rs)</td></tr>
+      ${(b.lines || []).map(l => `
+        <tr><td colspan="2" style="padding:4px 0 0;font-weight:700">${esc(l.name)}</td></tr>
+        <tr><td style="padding:0 0 3px;font-size:11px;color:#333">${l.qty} x ${Number(l.price).toLocaleString("en-LK", { minimumFractionDigits: 2 })}</td><td style="text-align:right;padding:0 0 3px;font-weight:700">${(l.qty * l.price).toLocaleString("en-LK", { minimumFractionDigits: 2 })}</td></tr>`).join("")}
+    </table>
+    ${RC_SEP}
+    <table style="width:100%;border-collapse:collapse">
+      ${b.disc ? rcRow("Subtotal", rs(subtotal)) + rcRow("Discount", "- " + rs(b.disc)) : ""}
+    </table>
+    <div style="border:2px solid #000;border-radius:6px;padding:5px 8px;margin:5px 0;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;font-weight:800;letter-spacing:1px">TOTAL</span>
+      <span style="font-size:17px;font-weight:800">${rs(b.total)}</span>
+    </div>
+    ${sale.length ? `${RC_SEP}${rcSection("SALE DETAILS")}<table style="width:100%;border-collapse:collapse;font-size:11.5px">${sale.map(([k, v]) => rcRow(esc(k), esc(v))).join("")}</table>` : ""}
+    ${credit ? `<div style="border:2px dashed #000;border-radius:6px;padding:4px 8px;margin-top:6px;text-align:center;font-weight:800">CREDIT BALANCE DUE: ${rs(credit)}</div>` : ""}
+    ${rcFoot(qr)}
+  </div>`;
+  rcPrint();
+}
+function printDueReceipt(d, pay, balAfter) {
+  const txt = `${SHOP.name} | Tel ${SHOP.phone}\nPayment received ${pay.date}\nBill: ${d.billNo || "-"}\nCustomer: ${d.name} | NIC ${d.nic || "-"}\nBike: ${d.bike || d.model || "-"}\n${d.kind === "rmv" ? "RMV" : "Credit"} paid: ${rs(pay.amt)}\nBalance: ${rs(balAfter)}`;
+  const qr = makeQR(txt);
+  const meta = [["Date", esc(pay.date)], ["Bill No", `<b>${esc(d.billNo || "-")}</b>`], ["Customer", esc(d.name)]];
+  if (d.nic) meta.push(["NIC", esc(d.nic)]);
+  if (d.phone) meta.push(["Tel", esc(d.phone)]);
+  if (d.bike) meta.push(["Bike No", `<b>${esc(d.bike)}</b>`]);
+  if (d.model) meta.push(["Model", esc(d.model)]);
+  meta.push(["Payment for", d.kind === "rmv" ? "RMV fee" : "Credit balance"], ["Received via", esc(pay.method)]);
+  $("receipt").innerHTML = `<div style="font-family:${RC_FONT};font-size:12px;line-height:1.45;color:#000">
+    ${rcHead("PAYMENT RECEIPT")}
+    <table style="width:100%;border-collapse:collapse">${meta.map(([a, v]) => rcRow(a, v)).join("")}</table>
+    ${RC_SEP}
+    <table style="width:100%;border-collapse:collapse">${rcRow("Total due", rs(d.amount)) + rcRow("Previously paid", rs((Number(d.paid) || 0)))}</table>
+    <div style="border:2px solid #000;border-radius:6px;padding:5px 8px;margin:5px 0;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;font-weight:800;letter-spacing:1px">PAID NOW</span>
+      <span style="font-size:17px;font-weight:800">${rs(pay.amt)}</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse">${rcRow("Balance remaining", rs(Math.max(0, balAfter)), true)}</table>
+    ${rcFoot(qr, "Thank you for your payment!")}
+  </div>`;
+  rcPrint();
+}
+
+// =====================================================================
+//  STAFF: EMPLOYEES, ATTENDANCE, PAYROLL (EPF / ETF)
+// =====================================================================
+let emps = [], advs = [], pays = [], attMonth = "", attRows = [], attUnsub = null, atDirty = false, prDirty = false;
+let prIn = {}, prCache = {};
+let paySet = { epfEmp: 8, epfEr: 12, etf: 3, noPayDiv: 30, otDiv: 240, otMul: 1.5 };
+const ATT_STATUS = ["Present", "Half Day", "Absent", "Paid Leave", "No-Pay Leave", "Holiday / Off"];
+const r2 = n => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
+const num = id => +$(id).value || 0;
+const monthLabel = m => new Date(m + "-01T00:00:00").toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+
+function refreshStaff() {
+  const a = document.querySelector(".tab-section.active");
+  if (!a) return;
+  if (a.id === "emp") renderEmps();
+  if (a.id === "att") renderAttendance();
+  if (a.id === "payroll") initPayroll(true);
+}
+function fillEmpSelects() {
+  const el = $("adv_emp"); if (!el) return;
+  const cur = el.value;
+  el.innerHTML = emps.filter(e => e.status !== "Left").map(e => `<option value="${e.id}">${esc(e.code)} - ${esc(e.name)}</option>`).join("");
+  if (cur) el.value = cur;
+}
+
+// ---------- Employees ----------
+function resetEmpForm() {
+  ["em_id", "em_name", "em_nic", "em_phone", "em_addr", "em_basic", "em_allowEpf", "em_allowOther", "em_epfNo", "em_etfNo", "em_bank", "em_emerg"].forEach(i => $(i).value = "");
+  $("em_join").value = today(); $("em_status").value = "Active";
+  $("em_epfOn").checked = true; $("em_otOn").checked = true;
+  $("em_title").textContent = "Add Employee"; $("em_saveBtn").textContent = "Save Employee";
+}
+async function saveEmployee() {
+  const id = $("em_id").value, name = $("em_name").value.trim();
+  if (!name) return toast("Enter the employee name");
+  if (!(num("em_basic") > 0)) return toast("Enter the basic salary");
+  const data = {
+    name, nic: $("em_nic").value.trim().toUpperCase(), phone: $("em_phone").value.trim(), addr: $("em_addr").value.trim(),
+    desig: $("em_desig").value, join: $("em_join").value, status: $("em_status").value,
+    basic: num("em_basic"), allowEpf: num("em_allowEpf"), allowOther: num("em_allowOther"),
+    epfNo: $("em_epfNo").value.trim(), etfNo: $("em_etfNo").value.trim(), epfOn: $("em_epfOn").checked, otOn: $("em_otOn").checked,
+    bank: $("em_bank").value.trim(), emerg: $("em_emerg").value.trim()
+  };
+  try {
+    if (id) { await db.collection("employees").doc(id).update(data); toast("Employee updated"); }
+    else { const code = await nextNo("emp", "EMP-", 3); await db.collection("employees").add({ ...data, code, created: Date.now() }); toast("Employee added: " + code); }
+    resetEmpForm();
+  } catch (e) { toast(e.message); }
+}
+function editEmp(id) {
+  const e = emps.find(x => x.id === id); if (!e) return;
+  $("em_id").value = id;
+  $("em_name").value = e.name || ""; $("em_nic").value = e.nic || ""; $("em_phone").value = e.phone || ""; $("em_addr").value = e.addr || "";
+  setSel("em_desig", e.desig); $("em_join").value = e.join || ""; $("em_status").value = e.status || "Active";
+  $("em_basic").value = e.basic || ""; $("em_allowEpf").value = e.allowEpf || ""; $("em_allowOther").value = e.allowOther || "";
+  $("em_epfNo").value = e.epfNo || ""; $("em_etfNo").value = e.etfNo || ""; $("em_bank").value = e.bank || ""; $("em_emerg").value = e.emerg || "";
+  $("em_epfOn").checked = e.epfOn !== false; $("em_otOn").checked = e.otOn !== false;
+  $("em_title").textContent = "Edit Employee - " + (e.code || ""); $("em_saveBtn").textContent = "Update Employee";
+  $("em_form").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function toggleEmp(id) {
+  const e = emps.find(x => x.id === id); if (!e) return;
+  db.collection("employees").doc(id).update({ status: e.status === "Left" ? "Active" : "Left" });
+}
+function delEmp(id) {
+  const e = emps.find(x => x.id === id); if (!e) return;
+  askConfirm({ title: "Delete employee?", message: `${e.code} - ${e.name} will be removed. Past payroll records are kept. (Use "Left" instead if they only resigned.)`, onConfirm: async () => { await db.collection("employees").doc(id).delete(); toast("Employee deleted"); } });
+}
+function renderEmps() {
+  if (!$("emBody")) return;
+  const q = $("em_search").value.toLowerCase(), st = $("em_fStatus").value;
+  const rows = emps.filter(e => (!st || (e.status || "Active") === st) && [e.code, e.name, e.nic, e.epfNo, e.etfNo, e.phone, e.desig].join(" ").toLowerCase().includes(q));
+  $("emBody").innerHTML = rows.map(e => `
+    <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
+      <td class="py-3 px-3 mono text-xs font-bold text-[#D90429]">${esc(e.code)}</td>
+      <td class="py-3 px-3"><div class="font-bold">${esc(e.name)}</div><div class="text-[11px] mono text-slate-500">NIC ${esc(e.nic || "-")} • ${esc(e.phone || "")}</div></td>
+      <td class="py-3 px-3 text-xs">${esc(e.desig || "-")}<div class="text-[11px] text-slate-500">Joined ${esc(e.join || "-")}</div></td>
+      <td class="py-3 px-3 mono text-xs">${e.epfOn === false ? '<span class="text-slate-400">Not applicable</span>' : `EPF ${esc(e.epfNo || "-")}<br>ETF ${esc(e.etfNo || "-")}`}</td>
+      <td class="py-3 px-3 text-right mono text-xs font-bold">${rs(e.basic)}</td>
+      <td class="py-3 px-3 text-right mono text-[11px] text-slate-500">EPF-able ${rs(e.allowEpf || 0)}<br>Other ${rs(e.allowOther || 0)}</td>
+      <td class="py-3 px-3"><span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${e.status === "Left" ? "bg-slate-200 dark:bg-slate-800 text-slate-500" : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"}">${esc(e.status || "Active")}</span></td>
+      <td class="py-3 px-3 text-right whitespace-nowrap space-x-1">
+        <button onclick="editEmp('${e.id}')" class="px-2.5 py-1 rounded-lg bg-[#14213D] text-white text-xs font-bold cursor-pointer">Edit</button>
+        <button onclick="toggleEmp('${e.id}')" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-bold cursor-pointer">${e.status === "Left" ? "Re-activate" : "Mark Left"}</button>
+        <button onclick="delEmp('${e.id}')" class="px-2.5 py-1 rounded-lg bg-red-500/10 text-[#D90429] text-xs font-bold cursor-pointer">Del</button>
+      </td></tr>`).join("") || `<tr><td colspan="8" class="py-8 text-center text-slate-500">No employees yet. Add the first one above.</td></tr>`;
+
+  $("advBody").innerHTML = advs.map(a => {
+    const bal = (Number(a.amount) || 0) - (Number(a.repaid) || 0);
+    return `<tr><td class="py-2.5 px-3 text-xs mono">${esc(a.date)}</td><td class="py-2.5 px-3 font-semibold">${esc(a.name)} <span class="text-[11px] mono text-slate-400">${esc(a.code || "")}</span></td>
+      <td class="py-2.5 px-3 text-right mono text-xs">${rs(a.amount)}</td><td class="py-2.5 px-3 text-right mono text-xs">${rs(a.monthly)}</td>
+      <td class="py-2.5 px-3 text-right mono text-xs text-emerald-600">${rs(a.repaid || 0)}</td>
+      <td class="py-2.5 px-3 text-right mono font-bold ${bal > 0 ? "text-[#D90429]" : "text-emerald-600"}">${bal > 0 ? rs(bal) : "CLEARED"}</td>
+      <td class="py-2.5 px-3 text-xs text-slate-500">${esc(a.note || "")}</td>
+      <td class="py-2.5 px-3 text-right"><button onclick="delAdvance('${a.id}')" class="px-2.5 py-1 rounded-lg bg-red-500/10 text-[#D90429] text-xs font-bold cursor-pointer">Del</button></td></tr>`;
+  }).join("") || `<tr><td colspan="8" class="py-6 text-center text-slate-500">No advances.</td></tr>`;
+}
+function xEmps() {
+  dl("Employees", emps.map(e => ({ Code: e.code, Name: e.name, NIC: e.nic || "", Phone: e.phone || "", Designation: e.desig || "", Joined: e.join || "", Status: e.status || "Active", "EPF No": e.epfNo || "", "ETF No": e.etfNo || "", Basic: e.basic, "EPF-able Allowance": e.allowEpf || 0, "Other Allowance": e.allowOther || 0, Bank: e.bank || "", Address: e.addr || "" })));
+}
+const advBal = a => (Number(a.amount) || 0) - (Number(a.repaid) || 0);
+async function addAdvance() {
+  const empId = $("adv_emp").value, e = emps.find(x => x.id === empId), amount = num("adv_amt");
+  if (!e) return toast("Select an employee");
+  if (!(amount > 0)) return toast("Enter the advance amount");
+  try {
+    await db.collection("advances").add({ empId, code: e.code, name: e.name, date: $("adv_date").value || today(), amount, monthly: num("adv_monthly") || amount, repaid: 0, note: $("adv_note").value.trim(), created: Date.now() });
+    if ($("adv_petty").checked) {
+      const ref = await nextNo("pc", "PC-", 4);
+      await db.collection("petty").add({ date: $("adv_date").value || today(), type: "out", cat: "Staff advance", desc: "Salary advance - " + e.name, amt: amount, ref, by: auth.currentUser.email, created: Date.now() });
+    }
+    ["adv_amt", "adv_monthly", "adv_note"].forEach(i => $(i).value = "");
+    toast("Advance recorded");
+  } catch (er) { toast(er.message); }
+}
+function delAdvance(id) {
+  const a = advs.find(x => x.id === id); if (!a) return;
+  askConfirm({ title: "Delete advance record?", message: `${a.name} - ${rs(a.amount)}. Petty cash entry (if any) is not removed.`, onConfirm: async () => { await db.collection("advances").doc(id).delete(); toast("Advance deleted"); } });
+}
+
+// ---------- Attendance ----------
+function ensureAtt(m) {
+  if (attMonth === m) return;
+  if (attUnsub) attUnsub();
+  attMonth = m; attRows = [];
+  attUnsub = db.collection("attendance").where("month", "==", m).onSnapshot(sn => {
+    attRows = sn.docs.map(d => ({ id: d.id, ...d.data() }));
+    refreshStaff();
+  }, e => toast("Attendance: " + e.message));
+}
+function attStats(empId) {
+  const r = attRows.filter(x => x.empId === empId);
+  const c = st => r.filter(x => x.status === st).length;
+  return { present: c("Present"), half: c("Half Day"), absent: c("Absent"), paidLeave: c("Paid Leave"), noPayLeave: c("No-Pay Leave"), holiday: c("Holiday / Off"), ot: r.reduce((a, x) => a + (Number(x.ot) || 0), 0), marked: r.length };
+}
+function renderAttendance() {
+  if (!$("atBody")) return;
+  const date = $("at_date").value || today(), m = date.slice(0, 7);
+  if (m !== attMonth) { ensureAtt(m); return; }
+  const act = emps.filter(e => e.status !== "Left");
+  if (!atDirty) {
+    const rec = Object.fromEntries(attRows.filter(r => r.date === date).map(r => [r.empId, r]));
+    $("atBody").innerHTML = act.map(e => {
+      const r = rec[e.id] || {};
+      return `<tr>
+        <td class="py-2.5 px-3"><div class="font-bold">${esc(e.name)}</div><div class="text-[11px] mono text-slate-400">${esc(e.code)} • ${esc(e.desig || "")}</div></td>
+        <td class="py-2.5 px-3"><select id="at_st_${e.id}" class="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-semibold"><option value="">-- not marked --</option>${ATT_STATUS.map(s => `<option ${r.status === s ? "selected" : ""}>${s}</option>`).join("")}</select></td>
+        <td class="py-2.5 px-3"><input id="at_in_${e.id}" type="time" value="${esc(r.in || "")}" class="px-2 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs"></td>
+        <td class="py-2.5 px-3"><input id="at_out_${e.id}" type="time" value="${esc(r.out || "")}" class="px-2 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs"></td>
+        <td class="py-2.5 px-3"><input id="at_ot_${e.id}" type="number" step="0.25" min="0" value="${r.ot || ""}" class="w-20 px-2 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs mono text-right"></td>
+        <td class="py-2.5 px-3"><input id="at_nt_${e.id}" value="${esc(r.note || "")}" class="w-full min-w-[140px] px-2 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs"></td></tr>`;
+    }).join("") || `<tr><td colspan="6" class="py-8 text-center text-slate-500">Add employees first.</td></tr>`;
+  }
+  $("atSumTitle").textContent = "Monthly Summary - " + monthLabel(m);
+  $("atSumBody").innerHTML = act.map(e => { const s = attStats(e.id); return `<tr><td class="py-2.5 px-3 font-semibold">${esc(e.name)}</td><td class="py-2.5 px-3 text-center mono text-emerald-600 font-bold">${s.present}</td><td class="py-2.5 px-3 text-center mono">${s.half}</td><td class="py-2.5 px-3 text-center mono ${s.absent ? "text-[#D90429] font-bold" : ""}">${s.absent}</td><td class="py-2.5 px-3 text-center mono">${s.paidLeave}</td><td class="py-2.5 px-3 text-center mono">${s.noPayLeave}</td><td class="py-2.5 px-3 text-center mono">${s.ot}</td><td class="py-2.5 px-3 text-center mono text-slate-500">${s.marked}</td></tr>`; }).join("");
+}
+function markAllPresent() {
+  emps.filter(e => e.status !== "Left").forEach(e => {
+    const st = $("at_st_" + e.id); if (!st) return;
+    st.value = "Present";
+    if (!$("at_in_" + e.id).value) $("at_in_" + e.id).value = "08:30";
+    if (!$("at_out_" + e.id).value) $("at_out_" + e.id).value = "17:30";
+  });
+  atDirty = true;
+}
+async function saveAttendance() {
+  const date = $("at_date").value || today(), batch = db.batch();
+  let n = 0;
+  emps.filter(e => e.status !== "Left").forEach(e => {
+    const st = $("at_st_" + e.id); if (!st) return;
+    const ref = db.collection("attendance").doc(`${e.id}_${date}`);
+    if (!st.value) { if (attRows.some(r => r.id === `${e.id}_${date}`)) { batch.delete(ref); n++; } return; }
+    batch.set(ref, { empId: e.id, code: e.code, name: e.name, date, month: date.slice(0, 7), status: st.value, in: $("at_in_" + e.id).value, out: $("at_out_" + e.id).value, ot: num("at_ot_" + e.id), note: $("at_nt_" + e.id).value.trim(), by: auth.currentUser.email, created: Date.now() });
+    n++;
+  });
+  if (!n) return toast("Nothing to save - mark attendance first");
+  try { await batch.commit(); atDirty = false; toast("Attendance saved for " + date); } catch (e) { toast(e.message); }
+}
+
+// ---------- Payroll ----------
+function fillPaySettings() {
+  if (!$("ps_epfEmp")) return;
+  ["epfEmp", "epfEr", "etf", "noPayDiv", "otDiv", "otMul"].forEach(k => { const el = $("ps_" + k); if (document.activeElement !== el) el.value = paySet[k]; });
+}
+async function savePaySettings() {
+  const v = {}; ["epfEmp", "epfEr", "etf", "noPayDiv", "otDiv", "otMul"].forEach(k => v[k] = num("ps_" + k));
+  if (!(v.noPayDiv > 0) || !(v.otDiv > 0)) return toast("Divisors must be greater than 0");
+  paySet = { ...paySet, ...v };
+  try { await db.doc("meta/payroll").set(v, { merge: true }); toast("Payroll rules saved"); } catch (e) { toast(e.message); }
+  prDirty = false; initPayroll(true);
+}
+function defaultAdvance(empId) {
+  return advs.filter(a => a.empId === empId && advBal(a) > 0).reduce((t, a) => t + Math.min(Number(a.monthly) || advBal(a), advBal(a)), 0);
+}
+function calcPay(e, m) {
+  const st = attStats(e.id), inp = prIn[e.id] || {};
+  const basic = +e.basic || 0, aE = +e.allowEpf || 0, aO = +e.allowOther || 0;
+  const noPayDays = st.absent + st.half * 0.5 + st.noPayLeave;
+  const noPay = Math.min(basic + aE, r2(noPayDays * (basic + aE) / paySet.noPayDiv));
+  const otHours = e.otOn === false ? 0 : st.ot;
+  const otAmt = r2(otHours * (basic / paySet.otDiv) * paySet.otMul);
+  const commission = +inp.commission || 0, bonus = +inp.bonus || 0, otherAdd = +inp.otherAdd || 0;
+  const gross = r2(basic + aE + aO - noPay + otAmt + commission + bonus + otherAdd);
+  const epfBase = r2(basic + aE - noPay), on = e.epfOn !== false;
+  const epfEmp = on ? r2(epfBase * paySet.epfEmp / 100) : 0, epfEr = on ? r2(epfBase * paySet.epfEr / 100) : 0, etf = on ? r2(epfBase * paySet.etf / 100) : 0;
+  const advance = inp.advance === undefined || inp.advance === "" ? defaultAdvance(e.id) : (+inp.advance || 0);
+  const otherDed = +inp.otherDed || 0, apit = +inp.apit || 0;
+  const totalDed = r2(epfEmp + advance + otherDed + apit);
+  return { month: m, empId: e.id, code: e.code, name: e.name, desig: e.desig || "", nic: e.nic || "", epfNo: e.epfNo || "", etfNo: e.etfNo || "", epfOn: on, join: e.join || "",
+    basic, allowEpf: aE, allowOther: aO, st, noPayDays, noPay, otHours, otAmt, commission, bonus, otherAdd, gross, epfBase, epfEmp, epfEr, etf, advance, otherDed, apit, totalDed, net: r2(gross - totalDed) };
+}
+const payDoc = (m, empId) => pays.find(p => p.id === m + "_" + empId);
+function rowData(e, m) { const d = payDoc(m, e.id); return d && d.status === "paid" ? { ...d, locked: true } : { ...calcPay(e, m), status: d ? d.status : "" }; }
+function payEmps(m) {
+  return emps.filter(e => e.status !== "Left" || payDoc(m, e.id));
+}
+function initPayroll(fromSnap) {
+  if (!$("prBody")) return;
+  const m = $("pr_month").value || today().slice(0, 7);
+  if (m !== attMonth) { ensureAtt(m); return; }
+  if (fromSnap && prDirty) return;
+  if (!prDirty) {
+    prIn = {};
+    pays.filter(p => p.month === m && p.status !== "paid").forEach(p => { prIn[p.empId] = { commission: p.commission || "", bonus: p.bonus || "", otherAdd: p.otherAdd || "", advance: p.advance, otherDed: p.otherDed || "", apit: p.apit || "" }; });
+  }
+  renderPayroll(m);
+}
+function renderPayroll(m) {
+  prCache = {};
+  const list = payEmps(m);
+  const inpCls = "w-[74px] px-1.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs mono text-right";
+  const cell = (id, f, d, v) => d.locked ? `<span class="mono">${rs(v || 0)}</span>` : `<input type="number" min="0" value="${v === 0 || v === undefined || v === "" ? "" : v}" oninput="prSet('${id}','${f}',this.value)" class="${inpCls}">`;
+  $("prBody").innerHTML = list.map(e => {
+    const d = rowData(e, m); prCache[e.id] = d; const inp = prIn[e.id] || {};
+    const sT = d.st || {};
+    return `<tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 align-middle">
+      <td class="py-2.5 px-2"><div class="font-bold text-[13px]">${esc(d.name)}</div><div class="text-[10px] mono text-slate-400">${esc(d.code)} • EPF ${esc(d.epfNo || "-")}</div></td>
+      <td class="py-2.5 px-2 text-right mono">${rs(d.basic)}<div class="text-[10px] text-slate-400">+${rs((d.allowEpf || 0) + (d.allowOther || 0))}</div></td>
+      <td class="py-2.5 px-2 text-center mono text-[11px]">${sT.present || 0} / ${sT.half || 0} / <span class="${sT.absent ? "text-[#D90429] font-bold" : ""}">${sT.absent || 0}</span> / ${sT.noPayLeave || 0}</td>
+      <td class="py-2.5 px-2 text-right mono text-[#D90429]" id="pr_np_${e.id}">${d.noPay ? "-" + rs(d.noPay) : "-"}</td>
+      <td class="py-2.5 px-2 text-right mono" id="pr_ot_${e.id}">${d.otAmt ? rs(d.otAmt) + `<div class="text-[10px] text-slate-400">${d.otHours} hrs</div>` : "-"}</td>
+      <td class="py-2.5 px-2 text-right">${cell(e.id, "commission", d, d.locked ? d.commission : inp.commission)}</td>
+      <td class="py-2.5 px-2 text-right">${cell(e.id, "bonus", d, d.locked ? d.bonus : inp.bonus)}</td>
+      <td class="py-2.5 px-2 text-right">${cell(e.id, "otherAdd", d, d.locked ? d.otherAdd : inp.otherAdd)}</td>
+      <td class="py-2.5 px-2 text-right mono font-bold" id="pr_gross_${e.id}">${rs(d.gross)}</td>
+      <td class="py-2.5 px-2 text-right mono" id="pr_epf_${e.id}">${rs(d.epfEmp)}</td>
+      <td class="py-2.5 px-2 text-right">${cell(e.id, "advance", d, d.locked ? d.advance : d.advance)}</td>
+      <td class="py-2.5 px-2 text-right">${cell(e.id, "otherDed", d, d.locked ? d.otherDed : inp.otherDed)}</td>
+      <td class="py-2.5 px-2 text-right">${cell(e.id, "apit", d, d.locked ? d.apit : inp.apit)}</td>
+      <td class="py-2.5 px-2 text-right mono font-extrabold text-[13px] text-[#D90429]" id="pr_net_${e.id}">${rs(d.net)}</td>
+      <td class="py-2.5 px-2 text-right whitespace-nowrap space-x-1">
+        <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${d.locked ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" : d.status === "draft" ? "bg-amber-500/15 text-amber-700 dark:text-amber-300" : "bg-slate-200 dark:bg-slate-800 text-slate-500"}">${d.locked ? "PAID" : d.status === "draft" ? "SAVED" : "NEW"}</span>
+        <button onclick="printPayslip('${e.id}')" class="px-2 py-1 rounded-lg bg-[#14213D] text-white text-[11px] font-bold cursor-pointer">Payslip</button>
+        ${d.locked ? `<button onclick="reopenPay('${e.id}')" class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-bold cursor-pointer">Reopen</button>` : `<button onclick="markPaid(['${e.id}'])" class="px-2 py-1 rounded-lg bg-[#D90429] text-white text-[11px] font-bold cursor-pointer">Pay</button>`}
+      </td></tr>`;
+  }).join("") || `<tr><td colspan="15" class="py-8 text-center text-slate-500">No employees to pay. Add employees first.</td></tr>`;
+  updatePrTotals();
+}
+function prSet(id, f, v) {
+  prIn[id] = { ...(prIn[id] || {}), [f]: v };
+  prDirty = true;
+  const e = emps.find(x => x.id === id), m = $("pr_month").value;
+  const d = calcPay(e, m); prCache[id] = { ...d, status: (payDoc(m, id) || {}).status || "" };
+  $("pr_gross_" + id).textContent = rs(d.gross);
+  $("pr_epf_" + id).textContent = rs(d.epfEmp);
+  $("pr_net_" + id).textContent = rs(d.net);
+  updatePrTotals();
+}
+function updatePrTotals() {
+  const rows = Object.values(prCache), sum = k => r2(rows.reduce((a, d) => a + (Number(d[k]) || 0), 0));
+  $("prFoot").innerHTML = `<tr class="border-t-2 border-slate-300 dark:border-slate-700 font-extrabold mono text-xs"><td class="py-3 px-2" colspan="8">TOTAL (${rows.length})</td><td class="py-3 px-2 text-right">${rs(sum("gross"))}</td><td class="py-3 px-2 text-right">${rs(sum("epfEmp"))}</td><td class="py-3 px-2 text-right">${rs(sum("advance"))}</td><td class="py-3 px-2 text-right">${rs(sum("otherDed"))}</td><td class="py-3 px-2 text-right">${rs(sum("apit"))}</td><td class="py-3 px-2 text-right text-[#D90429]">${rs(sum("net"))}</td><td></td></tr>`;
+  const card = (t, v, c = "") => `<div class="rounded-xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 p-3"><div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">${t}</div><div class="text-base font-extrabold mono mt-0.5 ${c}">${rs(v)}</div></div>`;
+  $("prCards").innerHTML = card("Gross salaries", sum("gross")) + card("Net payable", sum("net"), "text-[#D90429]") + card("EPF 8% (employee)", sum("epfEmp")) + card("EPF 12% (employer)", sum("epfEr")) + card("ETF 3% (employer)", sum("etf"));
+}
+function buildPayDoc(e, m, status) {
+  const d = calcPay(e, m);
+  return { ...d, status, updated: Date.now() };
+}
+async function savePayroll() {
+  const m = $("pr_month").value; if (!m) return;
+  const batch = db.batch(); let n = 0;
+  payEmps(m).forEach(e => {
+    const old = payDoc(m, e.id); if (old && old.status === "paid") return;
+    batch.set(db.collection("payroll").doc(m + "_" + e.id), buildPayDoc(e, m, "draft")); n++;
+  });
+  if (!n) return toast("Nothing to save");
+  try { await batch.commit(); prDirty = false; toast("Payroll saved for " + monthLabel(m)); } catch (e) { toast(e.message); }
+}
+function allocAdvance(empId, amount) {
+  let left = amount; const out = [];
+  advs.filter(a => a.empId === empId && advBal(a) > 0).sort((a, b) => (a.created || 0) - (b.created || 0)).forEach(a => {
+    const take = Math.min(left, advBal(a)); if (take > 0) { out.push({ id: a.id, amt: take }); left -= take; }
+  });
+  return out;
+}
+function markAllPaid() {
+  const m = $("pr_month").value;
+  const ids = payEmps(m).filter(e => { const o = payDoc(m, e.id); return !(o && o.status === "paid"); }).map(e => e.id);
+  if (!ids.length) return toast("Everyone is already paid");
+  markPaid(ids);
+}
+function markPaid(ids) {
+  const m = $("pr_month").value;
+  askConfirm({
+    title: "Mark salary as paid?", message: `${ids.length} employee(s) for ${monthLabel(m)}. Advance balances will be reduced and the figures locked (you can Reopen later).`,
+    onConfirm: async () => {
+      const batch = db.batch();
+      ids.forEach(id => {
+        const e = emps.find(x => x.id === id); if (!e) return;
+        const d = buildPayDoc(e, m, "paid"), det = allocAdvance(id, d.advance);
+        batch.set(db.collection("payroll").doc(m + "_" + id), { ...d, paidDate: today(), advDetail: det });
+        det.forEach(x => batch.update(db.collection("advances").doc(x.id), { repaid: firebase.firestore.FieldValue.increment(x.amt) }));
+      });
+      try { await batch.commit(); prDirty = false; toast("Marked as paid"); } catch (er) { toast(er.message); }
+    }
+  });
+}
+function reopenPay(empId) {
+  const m = $("pr_month").value, d = payDoc(m, empId); if (!d) return;
+  askConfirm({
+    title: "Reopen this payslip?", message: `${d.name} - ${monthLabel(m)}. Advance repayments will be reversed so you can edit and pay again.`,
+    onConfirm: async () => {
+      const batch = db.batch();
+      (d.advDetail || []).forEach(x => batch.update(db.collection("advances").doc(x.id), { repaid: firebase.firestore.FieldValue.increment(-x.amt) }));
+      batch.update(db.collection("payroll").doc(d.id), { status: "draft", paidDate: "", advDetail: [] });
+      try { await batch.commit(); prDirty = false; toast("Payslip reopened"); } catch (er) { toast(er.message); }
+    }
+  });
+}
+function printPayslip(empId) {
+  const m = $("pr_month").value, e = emps.find(x => x.id === empId); if (!e) return;
+  const d = rowData(e, m);
+  const row = (a, b, strong) => `<tr><td style="padding:3px 6px">${a}</td><td style="padding:3px 6px;text-align:right;${strong ? "font-weight:800" : ""}">${b}</td></tr>`;
+  const money = n => Number(n || 0).toLocaleString("en-LK", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const earn = [["Basic Salary", d.basic]];
+  if (d.allowEpf) earn.push(["EPF-able Allowance", d.allowEpf]);
+  if (d.allowOther) earn.push(["Other Allowance", d.allowOther]);
+  if (d.otAmt) earn.push([`Overtime (${d.otHours} hrs)`, d.otAmt]);
+  if (d.commission) earn.push(["Commission", d.commission]);
+  if (d.bonus) earn.push(["Bonus", d.bonus]);
+  if (d.otherAdd) earn.push(["Other Additions", d.otherAdd]);
+  const ded = [];
+  if (d.noPay) ded.push([`No-pay (${d.noPayDays} day${d.noPayDays === 1 ? "" : "s"})`, d.noPay]);
+  if (d.epfEmp) ded.push([`EPF ${paySet.epfEmp}% (employee)`, d.epfEmp]);
+  if (d.advance) ded.push(["Salary Advance", d.advance]);
+  if (d.otherDed) ded.push(["Other Deductions", d.otherDed]);
+  if (d.apit) ded.push(["APIT / Tax", d.apit]);
+  const totalDedShown = r2(d.totalDed + (d.noPay || 0));
+  const st = d.st || {};
+  const box = "border:1px solid #000;border-collapse:collapse;width:100%;font-size:12px";
+  $("receipt").innerHTML = `<div style="font-family:${RC_FONT};color:#000;border:2px solid #000;padding:18px 20px;max-width:720px;margin:0 auto">
+    <table style="width:100%;border-collapse:collapse"><tr>
+      <td style="width:80px"><img src="${LOGO}" style="width:70px;height:70px;object-fit:contain;border-radius:8px"></td>
+      <td><div style="font-size:24px;font-weight:800;letter-spacing:2px">${SHOP.name}</div><div style="font-size:11px;letter-spacing:1.5px;font-weight:600">AUTHORIZED SALES &amp; SERVICE &bull; Tel ${SHOP.phone}</div></td>
+      <td style="text-align:right"><div style="font-size:20px;font-weight:800;letter-spacing:3px">PAY SLIP</div><div style="font-size:13px;font-weight:700">${monthLabel(m)}</div></td>
+    </tr></table>
+    <div style="border-top:2px solid #000;margin:10px 0"></div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <tr><td style="padding:2px 0;width:50%"><b>Employee:</b> ${esc(d.name)}</td><td><b>Employee No:</b> ${esc(d.code)}</td></tr>
+      <tr><td style="padding:2px 0"><b>Designation:</b> ${esc(d.desig || "-")}</td><td><b>NIC:</b> ${esc(d.nic || "-")}</td></tr>
+      <tr><td style="padding:2px 0"><b>EPF No:</b> ${esc(d.epfNo || "-")}</td><td><b>ETF No:</b> ${esc(d.etfNo || "-")}</td></tr>
+      <tr><td style="padding:2px 0"><b>Date Joined:</b> ${esc(d.join || "-")}</td><td><b>Attendance:</b> Present ${st.present || 0} / Half ${st.half || 0} / Absent ${st.absent || 0} / No-pay leave ${st.noPayLeave || 0}</td></tr>
+    </table>
+    <div style="height:10px"></div>
+    <table style="width:100%;border-collapse:separate;border-spacing:10px 0;margin:0 -10px;width:calc(100% + 20px)"><tr style="vertical-align:top">
+      <td style="width:50%"><table style="${box}"><tr style="background:#eee"><td style="padding:5px 6px;font-weight:800;letter-spacing:1px">EARNINGS</td><td style="padding:5px 6px;text-align:right;font-weight:800">Rs</td></tr>
+        ${earn.map(([a, v]) => row(esc(a), money(v))).join("")}
+        <tr style="border-top:1px solid #000">${row("Gross Earnings", money(d.basic + d.allowEpf + d.allowOther + d.otAmt + d.commission + d.bonus + d.otherAdd), true).replace(/^<tr>|<\/tr>$/g, "")}</tr></table></td>
+      <td style="width:50%"><table style="${box}"><tr style="background:#eee"><td style="padding:5px 6px;font-weight:800;letter-spacing:1px">DEDUCTIONS</td><td style="padding:5px 6px;text-align:right;font-weight:800">Rs</td></tr>
+        ${ded.map(([a, v]) => row(esc(a), money(v))).join("") || row("-", "0.00")}
+        <tr style="border-top:1px solid #000">${row("Total Deductions", money(totalDedShown), true).replace(/^<tr>|<\/tr>$/g, "")}</tr></table></td>
+    </tr></table>
+    <div style="border:2px solid #000;border-radius:6px;padding:10px 14px;margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:15px;font-weight:800;letter-spacing:2px">NET SALARY</span><span style="font-size:22px;font-weight:800">Rs ${money(d.net)}</span>
+    </div>
+    ${d.epfOn ? `<div style="margin-top:10px;font-size:11px;border:1px dashed #000;padding:6px 10px">Employer contributions (not deducted from salary): EPF ${paySet.epfEr}% = <b>Rs ${money(d.epfEr)}</b> &nbsp;|&nbsp; ETF ${paySet.etf}% = <b>Rs ${money(d.etf)}</b> &nbsp;|&nbsp; EPF earnings base: Rs ${money(d.epfBase)}</div>` : ""}
+    <table style="width:100%;margin-top:42px;font-size:11px"><tr><td style="width:50%;text-align:center"><div style="border-top:1px solid #000;width:70%;margin:0 auto;padding-top:3px">Employer / Authorised Signature</div></td><td style="text-align:center"><div style="border-top:1px solid #000;width:70%;margin:0 auto;padding-top:3px">Employee Signature</div></td></tr></table>
+    <div style="text-align:center;font-size:9px;margin-top:12px;color:#444">Computer generated pay slip &bull; ${d.locked ? "Paid on " + esc(d.paidDate || "") : "Draft - not yet paid"}</div>
+  </div>`;
+  rcPrint(true);
+}
+function xPayroll() {
+  const m = $("pr_month").value;
+  dl("Payroll_" + m, payEmps(m).map(e => { const d = rowData(e, m); return { Month: m, Code: d.code, Name: d.name, Designation: d.desig, "EPF No": d.epfNo, Basic: d.basic, "EPF-able Allowance": d.allowEpf, "Other Allowance": d.allowOther, "No-pay Days": d.noPayDays, "No-pay Deduction": d.noPay, "OT Hours": d.otHours, "OT Amount": d.otAmt, Commission: d.commission, Bonus: d.bonus, "Other Additions": d.otherAdd, "Gross Pay": d.gross, "EPF Employee": d.epfEmp, Advance: d.advance, "Other Deductions": d.otherDed, APIT: d.apit, "Net Salary": d.net, Status: d.locked ? "Paid" : (d.status === "draft" ? "Saved" : "Not saved") }; }));
+}
+function xEpf() {
+  const m = $("pr_month").value;
+  const rows = payEmps(m).map(e => rowData(e, m)).filter(d => d.epfOn).map(d => ({ Month: m, Name: d.name, NIC: d.nic, "EPF No": d.epfNo, "ETF No": d.etfNo, "Total Earnings (EPF base)": d.epfBase, "Employee EPF": d.epfEmp, "Employer EPF": d.epfEr, "Total EPF": r2(d.epfEmp + d.epfEr), "ETF (Employer)": d.etf }));
+  if (rows.length) rows.push({ Month: "", Name: "TOTAL", NIC: "", "EPF No": "", "ETF No": "", "Total Earnings (EPF base)": r2(rows.reduce((a, r) => a + r["Total Earnings (EPF base)"], 0)), "Employee EPF": r2(rows.reduce((a, r) => a + r["Employee EPF"], 0)), "Employer EPF": r2(rows.reduce((a, r) => a + r["Employer EPF"], 0)), "Total EPF": r2(rows.reduce((a, r) => a + r["Total EPF"], 0)), "ETF (Employer)": r2(rows.reduce((a, r) => a + r["ETF (Employer)"], 0)) });
+  dl("EPF_ETF_" + m, rows);
 }
 
 // Initialize Theme & Icons on Boot
