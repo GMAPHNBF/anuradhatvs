@@ -7,6 +7,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{--ink:#14213d;--red:#c8102e;--bg:#f2f3f6;--card:#fff;--line:#d9dce3;--ok:#1b7f3b;--warn:#b45309}
 *{box-sizing:border-box}
@@ -33,9 +34,32 @@ th{background:var(--bg)}
 .tag{padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600;background:#e4e6ec}
 .tag.Done{background:#d4f0dc;color:var(--ok)}.tag.Working{background:#fde8c8;color:var(--warn)}
 .tot{text-align:right;font-size:20px;font-weight:700;margin:12px 0}
-#auth{max-width:380px;margin:8vh auto;background:var(--card);padding:26px;border-radius:10px;border-top:5px solid var(--red)}
-#auth input{margin:6px 0}
-#msg{color:var(--red);font-size:13px;min-height:18px}
+#auth{display:flex;min-height:100vh}
+#auth .brand{flex:1;background:var(--ink);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:40px;border-right:6px solid var(--red)}
+#auth .brand h1{font-size:38px;letter-spacing:1px}
+#auth .brand p{opacity:.75;margin:8px 0 0}
+#auth .box{flex:1;display:flex;flex-direction:column;justify-content:center;padding:40px;max-width:480px;margin:auto;width:100%}
+#auth input{margin:4px 0 12px}
+#auth .b{width:100%;margin-top:6px;padding:12px}
+#auth a{color:var(--red);font-weight:600;cursor:pointer}
+.chk{display:flex;gap:6px;align-items:center;font-size:13px;margin-bottom:8px}.chk input{width:auto;margin:0}
+#menuBtn{display:none;background:none;border:0;color:#fff;font-size:26px;margin-right:10px;cursor:pointer}
+#ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:15}#ov.show{display:block}
+.sum{background:var(--bg);padding:12px;border-radius:8px}.sum b{display:block;font-size:20px}
+@media(max-width:760px){
+ #auth{flex-direction:column;min-height:auto}
+ #auth .brand{padding:26px 22px;border-right:0;border-bottom:5px solid var(--red)}#auth .brand h1{font-size:28px}
+ #auth .box{padding:22px 20px}
+ #menuBtn{display:inline-block}
+ header small{display:none}
+ nav{position:fixed;top:0;left:0;bottom:0;width:230px;background:var(--ink);flex-direction:column;padding:70px 12px;transform:translateX(-100%);transition:transform .2s;z-index:20;gap:6px}
+ nav.open{transform:none}
+ nav button{background:transparent;color:#fff;border-radius:8px;text-align:left;padding:12px 14px}
+ nav button.on{background:var(--red);color:#fff}
+ main{margin:10px 8px 14px;border-radius:8px;padding:12px}
+ th,td{padding:6px;font-size:13px}
+}
+.msg{color:var(--red);font-size:13px;min-height:18px;margin-bottom:6px}
 #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:8px;display:none;z-index:9}
 #receipt{display:none}
 @media print{body>*:not(#receipt){display:none!important}#receipt{display:block;font-family:monospace;width:300px;margin:0 auto;font-size:13px}#receipt td,#receipt th{border:0;padding:2px}}
@@ -44,22 +68,39 @@ th{background:var(--bg)}
 <body>
 
 <div id="auth">
-  <h2>ANURADHA TVS</h2>
-  <p style="margin:4px 0 12px;opacity:.7">Sign in to the shop system</p>
-  <input id="em" type="email" placeholder="Email">
-  <input id="pw" type="password" placeholder="Password (6+ characters)">
-  <div id="msg"></div>
-  <button class="b" onclick="login()">Log in</button>
-  <button class="b g" onclick="register()">Create account</button>
+  <div class="brand"><h1>ANURADHA TVS</h1><p>Billing, stock and bike service in one place.</p></div>
+  <div class="box">
+    <div id="loginForm">
+      <h2 style="margin-bottom:14px">Log in</h2>
+      <label>Email</label><input id="em" type="email" autocomplete="username">
+      <label>Password</label><input id="pw" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()">
+      <div id="msg" class="msg"></div>
+      <button class="b" onclick="login()">Log in</button>
+      <p style="margin-top:16px">New here? <a onclick="showAuth('reg')">Create an account</a></p>
+    </div>
+    <div id="regForm" style="display:none">
+      <h2 style="margin-bottom:14px">Create account</h2>
+      <label>Your name</label><input id="r_name" autocomplete="name">
+      <label>Email</label><input id="r_em" type="email" autocomplete="username">
+      <label>Password (6+ characters)</label><input id="r_pw" type="password" autocomplete="new-password">
+      <label>Enter password again</label><input id="r_pw2" type="password" autocomplete="new-password">
+      <div class="chk"><input type="checkbox" id="showpw" onchange="['r_pw','r_pw2'].forEach(i=>$(i).type=this.checked?'text':'password')"><label for="showpw" style="margin:0;font-weight:400">Show passwords</label></div>
+      <div id="rmsg" class="msg"></div>
+      <button class="b" onclick="register()">Create account</button>
+      <p style="margin-top:16px">Already have an account? <a onclick="showAuth('login')">Log in</a></p>
+    </div>
+  </div>
 </div>
 
 <div id="app" style="display:none">
-<header><div><b>ANURADHA TVS</b><small id="who"></small></div><button class="b s" onclick="auth.signOut()">Log out</button></header>
+<header><div style="display:flex;align-items:center"><button id="menuBtn" onclick="toggleMenu()">&#9776;</button><b>ANURADHA TVS</b><small id="who"></small></div><button class="b s" onclick="auth.signOut()">Log out</button></header>
+<div id="ov" onclick="toggleMenu(false)"></div>
 <nav id="nav">
   <button data-t="stock" class="on">Stock</button>
   <button data-t="bill">New bill</button>
   <button data-t="service">Bike service</button>
   <button data-t="bills">Bill history</button>
+  <button data-t="reports">Reports</button>
 </nav>
 <main>
 
@@ -125,6 +166,22 @@ th{background:var(--bg)}
   <div class="wrap"><table><thead><tr><th>Bill no</th><th>Date</th><th>Customer</th><th>Bike</th><th>Total</th><th></th></tr></thead><tbody id="billBody"></tbody></table></div>
 </section>
 
+<section id="reports">
+  <h3>Reports</h3>
+  <div class="row">
+    <div><label>From</label><input type="date" id="r_from" onchange="renderReport()"></div>
+    <div><label>To</label><input type="date" id="r_to" onchange="renderReport()"></div>
+  </div>
+  <div class="row" id="rSum"></div>
+  <h3 style="margin-top:14px">Download as Excel</h3>
+  <div class="row">
+    <button class="b" onclick="xSales()">Sales report</button>
+    <button class="b g" onclick="xStock()">Stock report</button>
+    <button class="b g" onclick="xJobs()">Service jobs</button>
+  </div>
+  <p style="font-size:13px;opacity:.7">Sales and service reports use the dates above. The stock report shows current stock.</p>
+</section>
+
 </main>
 </div>
 
@@ -153,20 +210,28 @@ const today = () => new Date().toISOString().slice(0, 10);
 function toast(t){const e=$("toast");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",2600)}
 
 // ---------- Auth ----------
-function login(){auth.signInWithEmailAndPassword($("em").value,$("pw").value).catch(e=>$("msg").textContent=e.message)}
-function register(){auth.createUserWithEmailAndPassword($("em").value,$("pw").value).catch(e=>$("msg").textContent=e.message)}
+function showAuth(w){$("loginForm").style.display=w==="reg"?"none":"block";$("regForm").style.display=w==="reg"?"block":"none";$("msg").textContent=$("rmsg").textContent=""}
+function login(){auth.signInWithEmailAndPassword($("em").value.trim(),$("pw").value).catch(e=>$("msg").textContent=e.message)}
+async function register(){
+  const n=$("r_name").value.trim(),m=$("r_em").value.trim(),p=$("r_pw").value,p2=$("r_pw2").value,x=$("rmsg");
+  if(!n||!m)return x.textContent="Enter your name and email.";
+  if(p.length<6)return x.textContent="Password must be at least 6 characters.";
+  if(p!==p2)return x.textContent="The two passwords do not match.";
+  try{const c=await auth.createUserWithEmailAndPassword(m,p);await c.user.updateProfile({displayName:n});$("who").textContent=n}catch(e){x.textContent=e.message}
+}
+function toggleMenu(f){const o=typeof f==="boolean"?f:!$("nav").classList.contains("open");$("nav").classList.toggle("open",o);$("ov").classList.toggle("show",o)}
 auth.onAuthStateChanged(u=>{
   unsubs.forEach(f=>f());unsubs=[];
-  $("auth").style.display=u?"none":"block";$("app").style.display=u?"block":"none";
+  $("auth").style.display=u?"none":"flex";$("app").style.display=u?"block":"none";
   if(!u)return;
-  $("who").textContent=u.email;
+  $("who").textContent=u.displayName||u.email;$("r_from").value=today().slice(0,8)+"01";$("r_to").value=today();
   unsubs.push(db.collection("items").orderBy("code").onSnapshot(s=>{items=s.docs.map(d=>({id:d.id,...d.data()}));renderStock();fillItemSelect()}));
   unsubs.push(db.collection("bills").orderBy("no","desc").limit(200).onSnapshot(s=>{bills=s.docs.map(d=>({id:d.id,...d.data()}));renderBills()}));
   unsubs.push(db.collection("jobs").orderBy("created","desc").limit(200).onSnapshot(s=>{jobs=s.docs.map(d=>({id:d.id,...d.data()}));renderJobs()}));
 });
 $("nav").onclick=e=>{const t=e.target.dataset.t;if(!t)return;
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b===e.target));
-  document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id===t))};
+  document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id===t));toggleMenu(false);if(t==="reports")renderReport()};
 
 // ---------- Auto numbers (ITM-0001, BILL-0001) ----------
 async function nextNo(key,prefix,pad){
@@ -259,6 +324,31 @@ function printBill(b){
 }
 function renderBills(){
   $("billBody").innerHTML=bills.map(b=>`<tr><td>${esc(b.no)}</td><td>${esc(b.date)}</td><td>${esc(b.name)}</td><td>${esc(b.bike)}</td><td>${rs(b.total)}</td><td><button class="b s g" onclick="printBill(bills.find(x=>x.id==='${b.id}'))">Reprint</button></td></tr>`).join("")||`<tr><td colspan="6">No bills yet.</td></tr>`;
+}
+
+// ---------- Reports (Excel) ----------
+async function getRange(col){
+  let q=db.collection(col);const f=$("r_from").value,t=$("r_to").value;
+  if(f)q=q.where("date",">=",f);if(t)q=q.where("date","<=",t);
+  return (await q.get()).docs.map(d=>d.data());
+}
+async function renderReport(){
+  const b=await getRange("bills"),tot=b.reduce((a,x)=>a+x.total,0),dis=b.reduce((a,x)=>a+(x.disc||0),0);
+  $("rSum").innerHTML=`<div class="sum">Bills<b>${b.length}</b></div><div class="sum">Total sales<b>${rs(tot)}</b></div><div class="sum">Discounts given<b>${rs(dis)}</b></div><div class="sum">Items low on stock<b>${items.filter(i=>i.qty<=i.min).length}</b></div>`;
+}
+function dl(name,rows){
+  if(!rows.length)return toast("No data for this report");
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),"Report");
+  XLSX.writeFile(wb,name+"_"+today()+".xlsx");
+}
+async function xSales(){
+  const b=(await getRange("bills")).sort((x,y)=>x.no.localeCompare(y.no));
+  dl("Sales",b.map(x=>({"Bill no":x.no,Date:x.date,Customer:x.name,Phone:x.phone,"Bike no":x.bike,Items:x.lines.map(l=>l.name+" x"+l.qty).join(", "),Discount:x.disc||0,Total:x.total,"Billed by":x.by})));
+}
+function xStock(){dl("Stock",items.map(i=>({Code:i.code,Item:i.name,Category:i.cat,Price:i.price,"In stock":i.qty,"Low stock level":i.min,"Stock value":i.price*i.qty})))}
+async function xJobs(){
+  const j=(await getRange("jobs")).sort((x,y)=>x.job.localeCompare(y.job));
+  dl("Service_jobs",j.map(x=>({"Job no":x.job,Date:x.date,Customer:x.name,Phone:x.phone,"Bike no":x.bike,Model:x.model,Service:x.type,"Meter km":x.km,"Next service":x.next,Status:x.status,Notes:x.note})));
 }
 
 // ---------- Bike service ----------
