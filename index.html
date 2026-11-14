@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ANURADHA TVS</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+:root{--ink:#14213d;--red:#c8102e;--bg:#f2f3f6;--card:#fff;--line:#d9dce3;--ok:#1b7f3b;--warn:#b45309}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
+h1,h2,h3{margin:0}
+header{background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:4px solid var(--red)}
+header b{font-size:20px;letter-spacing:.5px}
+header small{opacity:.7;margin-left:8px}
+nav{display:flex;gap:4px;padding:10px 14px 0;flex-wrap:wrap}
+nav button{background:#e4e6ec;border:0;padding:10px 18px;border-radius:8px 8px 0 0;font-weight:600;cursor:pointer;color:var(--ink)}
+nav button.on{background:var(--card);color:var(--red)}
+main{background:var(--card);margin:0 14px 20px;padding:16px;border-radius:0 8px 8px 8px;min-height:60vh}
+section{display:none}section.on{display:block}
+input,select,textarea{padding:9px;border:1px solid var(--line);border-radius:6px;font:inherit;width:100%;background:#fff;color:var(--ink)}
+button.b{background:var(--red);color:#fff;border:0;padding:9px 16px;border-radius:6px;font-weight:600;cursor:pointer}
+button.b.g{background:var(--ink)}button.b.s{padding:5px 10px;font-size:13px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0;align-items:end}
+label{font-size:12px;font-weight:600;display:block;margin-bottom:3px;opacity:.75}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);font-size:14px}
+th{background:var(--bg)}
+.wrap{overflow-x:auto}
+.low{color:var(--red);font-weight:700}
+.tag{padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600;background:#e4e6ec}
+.tag.Done{background:#d4f0dc;color:var(--ok)}.tag.Working{background:#fde8c8;color:var(--warn)}
+.tot{text-align:right;font-size:20px;font-weight:700;margin:12px 0}
+#auth{max-width:380px;margin:8vh auto;background:var(--card);padding:26px;border-radius:10px;border-top:5px solid var(--red)}
+#auth input{margin:6px 0}
+#msg{color:var(--red);font-size:13px;min-height:18px}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:8px;display:none;z-index:9}
+#receipt{display:none}
+@media print{body>*:not(#receipt){display:none!important}#receipt{display:block;font-family:monospace;width:300px;margin:0 auto;font-size:13px}#receipt td,#receipt th{border:0;padding:2px}}
+</style>
+</head>
+<body>
+
+<div id="auth">
+  <h2>ANURADHA TVS</h2>
+  <p style="margin:4px 0 12px;opacity:.7">Sign in to the shop system</p>
+  <input id="em" type="email" placeholder="Email">
+  <input id="pw" type="password" placeholder="Password (6+ characters)">
+  <div id="msg"></div>
+  <button class="b" onclick="login()">Log in</button>
+  <button class="b g" onclick="register()">Create account</button>
+</div>
+
+<div id="app" style="display:none">
+<header><div><b>ANURADHA TVS</b><small id="who"></small></div><button class="b s" onclick="auth.signOut()">Log out</button></header>
+<nav id="nav">
+  <button data-t="stock" class="on">Stock</button>
+  <button data-t="bill">New bill</button>
+  <button data-t="service">Bike service</button>
+  <button data-t="bills">Bill history</button>
+</nav>
+<main>
+
+<section id="stock" class="on">
+  <h3>Add new item</h3>
+  <div class="row">
+    <div><label>Item name</label><input id="in_name"></div>
+    <div><label>Category</label><select id="in_cat"><option>Spare part</option><option>Oil / Lube</option><option>Tyre / Tube</option><option>Accessory</option><option>Battery</option><option>Other</option></select></div>
+    <div><label>Selling price (Rs)</label><input id="in_price" type="number" min="0"></div>
+    <div><label>Opening qty</label><input id="in_qty" type="number" min="0" value="0"></div>
+    <div><label>Low stock alert at</label><input id="in_min" type="number" min="0" value="3"></div>
+    <div><button class="b" onclick="addItem()">Save item</button></div>
+  </div>
+  <p style="font-size:13px;opacity:.7;margin:0">The item code (e.g. ITM-0001) is made automatically.</p>
+  <h3 style="margin-top:18px">Stock list</h3>
+  <input id="q" placeholder="Search by name or code" oninput="renderStock()" style="max-width:320px;margin-top:8px">
+  <div class="wrap"><table><thead><tr><th>Code</th><th>Item</th><th>Category</th><th>Price</th><th>In stock</th><th>Add stock</th><th></th></tr></thead><tbody id="stockBody"></tbody></table></div>
+</section>
+
+<section id="bill">
+  <h3>Customer</h3>
+  <div class="row">
+    <div><label>Name</label><input id="c_name"></div>
+    <div><label>Phone</label><input id="c_phone"></div>
+    <div><label>Bike number</label><input id="c_bike"></div>
+  </div>
+  <h3>Add parts / items from stock</h3>
+  <div class="row">
+    <div style="grid-column:span 2"><label>Item</label><select id="b_item"></select></div>
+    <div><label>Qty</label><input id="b_qty" type="number" min="1" value="1"></div>
+    <div><button class="b g" onclick="addCart()">Add to bill</button></div>
+  </div>
+  <h3>Add service / labour charge</h3>
+  <div class="row">
+    <div style="grid-column:span 2"><label>Description</label><input id="l_desc" placeholder="e.g. Full service labour"></div>
+    <div><label>Amount (Rs)</label><input id="l_amt" type="number" min="0"></div>
+    <div><button class="b g" onclick="addLabour()">Add charge</button></div>
+  </div>
+  <div class="wrap"><table><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th></th></tr></thead><tbody id="cartBody"></tbody></table></div>
+  <div class="row" style="max-width:300px;margin-left:auto"><div><label>Discount (Rs)</label><input id="b_disc" type="number" min="0" value="0" oninput="renderCart()"></div></div>
+  <div class="tot" id="grand">Total: Rs 0.00</div>
+  <div style="text-align:right"><button class="b" onclick="saveBill()">Save bill &amp; print</button></div>
+</section>
+
+<section id="service">
+  <h3>New service job</h3>
+  <div class="row">
+    <div><label>Customer</label><input id="s_name"></div>
+    <div><label>Phone</label><input id="s_phone"></div>
+    <div><label>Bike number</label><input id="s_bike"></div>
+    <div><label>Model</label><select id="s_model"><option>TVS Apache</option><option>TVS Ntorq</option><option>TVS Jupiter</option><option>TVS Raider</option><option>TVS Star City</option><option>TVS HLX</option><option>TVS Scooty</option><option>TVS XL</option><option>Other</option></select></div>
+    <div><label>Service type</label><select id="s_type"><option>Full service</option><option>Oil change</option><option>Brake repair</option><option>Engine repair</option><option>Electrical</option><option>Tyre / puncture</option><option>Washing</option><option>Other</option></select></div>
+    <div><label>Meter (km)</label><input id="s_km" type="number"></div>
+    <div><label>Next service date</label><input id="s_next" type="date"></div>
+  </div>
+  <div class="row"><div style="grid-column:1/-1"><label>Problem / notes</label><textarea id="s_note" rows="2"></textarea></div><div><button class="b" onclick="addJob()">Save job</button></div></div>
+  <h3 style="margin-top:16px">Service jobs</h3>
+  <div class="wrap"><table><thead><tr><th>Date</th><th>Customer</th><th>Bike</th><th>Service</th><th>Next due</th><th>Status</th><th></th></tr></thead><tbody id="jobBody"></tbody></table></div>
+</section>
+
+<section id="bills">
+  <h3>Bill history</h3>
+  <div class="wrap"><table><thead><tr><th>Bill no</th><th>Date</th><th>Customer</th><th>Bike</th><th>Total</th><th></th></tr></thead><tbody id="billBody"></tbody></table></div>
+</section>
+
+</main>
+</div>
+
+<div id="receipt"></div>
+<div id="toast"></div>
+
+<script>
+// ====== PASTE YOUR FIREBASE CONFIG HERE (Firebase Console > Project settings > Your apps > Web app) ======
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "000000000000",
+  appId: "YOUR_APP_ID"
+};
+// =========================================================================================================
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth(), db = firebase.firestore();
+let items = [], bills = [], jobs = [], cart = [], unsubs = [];
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const rs = n => "Rs " + Number(n || 0).toLocaleString("en-LK", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const today = () => new Date().toISOString().slice(0, 10);
+function toast(t){const e=$("toast");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",2600)}
+
+// ---------- Auth ----------
+function login(){auth.signInWithEmailAndPassword($("em").value,$("pw").value).catch(e=>$("msg").textContent=e.message)}
+function register(){auth.createUserWithEmailAndPassword($("em").value,$("pw").value).catch(e=>$("msg").textContent=e.message)}
+auth.onAuthStateChanged(u=>{
+  unsubs.forEach(f=>f());unsubs=[];
+  $("auth").style.display=u?"none":"block";$("app").style.display=u?"block":"none";
+  if(!u)return;
+  $("who").textContent=u.email;
+  unsubs.push(db.collection("items").orderBy("code").onSnapshot(s=>{items=s.docs.map(d=>({id:d.id,...d.data()}));renderStock();fillItemSelect()}));
+  unsubs.push(db.collection("bills").orderBy("no","desc").limit(200).onSnapshot(s=>{bills=s.docs.map(d=>({id:d.id,...d.data()}));renderBills()}));
+  unsubs.push(db.collection("jobs").orderBy("created","desc").limit(200).onSnapshot(s=>{jobs=s.docs.map(d=>({id:d.id,...d.data()}));renderJobs()}));
+});
+$("nav").onclick=e=>{const t=e.target.dataset.t;if(!t)return;
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b===e.target));
+  document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id===t))};
+
+// ---------- Auto numbers (ITM-0001, BILL-0001) ----------
+async function nextNo(key,prefix,pad){
+  return db.runTransaction(async t=>{
+    const r=db.doc("meta/counters"),d=await t.get(r);
+    const n=((d.exists&&d.data()[key])||0)+1;
+    t.set(r,{[key]:n},{merge:true});
+    return prefix+String(n).padStart(pad,"0");
+  });
+}
+
+// ---------- Stock ----------
+async function addItem(){
+  const name=$("in_name").value.trim();
+  if(!name)return toast("Enter item name");
+  const code=await nextNo("item","ITM-",4);
+  await db.collection("items").add({code,name,cat:$("in_cat").value,price:+$("in_price").value||0,qty:+$("in_qty").value||0,min:+$("in_min").value||0});
+  ["in_name","in_price"].forEach(i=>$(i).value="");$("in_qty").value=0;
+  toast("Saved as "+code);
+}
+function renderStock(){
+  const q=$("q").value.toLowerCase();
+  $("stockBody").innerHTML=items.filter(i=>(i.name+i.code).toLowerCase().includes(q)).map(i=>`
+  <tr><td>${esc(i.code)}</td><td>${esc(i.name)}</td><td>${esc(i.cat)}</td><td>${rs(i.price)}</td>
+  <td class="${i.qty<=i.min?"low":""}">${i.qty}${i.qty<=i.min?" (low)":""}</td>
+  <td><input type="number" min="1" id="add_${i.id}" style="width:70px;display:inline"> <button class="b s" onclick="stockIn('${i.id}')">Add</button></td>
+  <td><button class="b s g" onclick="editPrice('${i.id}')">Price</button> <button class="b s" onclick="delItem('${i.id}')">Delete</button></td></tr>`).join("")||`<tr><td colspan="7">No items yet. Add your first item above.</td></tr>`;
+}
+async function stockIn(id){
+  const n=+$("add_"+id).value;if(!n)return;
+  await db.collection("items").doc(id).update({qty:firebase.firestore.FieldValue.increment(n)});toast("Stock updated");
+}
+async function editPrice(id){
+  const p=prompt("New selling price (Rs)");if(p===null||isNaN(p))return;
+  await db.collection("items").doc(id).update({price:+p});
+}
+async function delItem(id){if(confirm("Delete this item?"))await db.collection("items").doc(id).delete()}
+
+// ---------- Billing ----------
+function fillItemSelect(){
+  $("b_item").innerHTML=items.map(i=>`<option value="${i.id}">${esc(i.code)} - ${esc(i.name)} (stock ${i.qty}) - ${rs(i.price)}</option>`).join("");
+}
+function addCart(){
+  const it=items.find(i=>i.id===$("b_item").value),q=+$("b_qty").value;
+  if(!it||q<1)return;
+  const have=cart.filter(c=>c.id===it.id).reduce((a,c)=>a+c.qty,0);
+  if(have+q>it.qty)return toast("Only "+it.qty+" in stock");
+  const ex=cart.find(c=>c.id===it.id);
+  ex?ex.qty+=q:cart.push({id:it.id,code:it.code,name:it.name,price:it.price,qty:q});
+  renderCart();
+}
+function addLabour(){
+  const d=$("l_desc").value.trim(),a=+$("l_amt").value;
+  if(!d||!a)return;cart.push({id:null,name:d,price:a,qty:1});
+  $("l_desc").value="";$("l_amt").value="";renderCart();
+}
+const sub=()=>cart.reduce((a,c)=>a+c.price*c.qty,0);
+const grand=()=>Math.max(0,sub()-(+$("b_disc").value||0));
+function renderCart(){
+  $("cartBody").innerHTML=cart.map((c,i)=>`<tr><td>${esc(c.name)}</td><td>${c.qty}</td><td>${rs(c.price)}</td><td>${rs(c.price*c.qty)}</td><td><button class="b s" onclick="cart.splice(${i},1);renderCart()">Remove</button></td></tr>`).join("");
+  $("grand").textContent="Total: "+rs(grand());
+}
+async function saveBill(){
+  if(!cart.length)return toast("Bill is empty");
+  try{
+    const lines=[...cart],disc=+$("b_disc").value||0;
+    const bill=await db.runTransaction(async t=>{
+      const cRef=db.doc("meta/counters"),cDoc=await t.get(cRef);
+      const refs=[...new Set(lines.filter(l=>l.id).map(l=>l.id))].map(id=>db.collection("items").doc(id));
+      const docs=await Promise.all(refs.map(r=>t.get(r)));
+      docs.forEach(d=>{const need=lines.filter(l=>l.id===d.id).reduce((a,l)=>a+l.qty,0);
+        if(!d.exists||d.data().qty<need)throw new Error("Not enough stock: "+(d.exists?d.data().name:"item removed"))});
+      const n=((cDoc.exists&&cDoc.data().bill)||0)+1,no="BILL-"+String(n).padStart(4,"0");
+      t.set(cRef,{bill:n},{merge:true});
+      docs.forEach(d=>{const need=lines.filter(l=>l.id===d.id).reduce((a,l)=>a+l.qty,0);t.update(d.ref,{qty:d.data().qty-need})});
+      const b={no,date:today(),name:$("c_name").value.trim()||"Walk-in",phone:$("c_phone").value.trim(),bike:$("c_bike").value.trim(),lines,disc,total:Math.max(0,lines.reduce((a,l)=>a+l.price*l.qty,0)-disc),by:auth.currentUser.email,created:Date.now()};
+      t.set(db.collection("bills").doc(),b);
+      return b;
+    });
+    cart=[];renderCart();["c_name","c_phone","c_bike"].forEach(i=>$(i).value="");$("b_disc").value=0;
+    printBill(bill);
+  }catch(e){toast(e.message)}
+}
+function printBill(b){
+  $("receipt").innerHTML=`<div style="text-align:center"><b style="font-size:17px">ANURADHA TVS</b><br>Sales &amp; Service<br>--------------------------</div>
+  Bill: ${esc(b.no)}<br>Date: ${esc(b.date)}<br>Customer: ${esc(b.name)} ${esc(b.phone)}<br>Bike: ${esc(b.bike)}<br>--------------------------
+  <table style="width:100%">${b.lines.map(l=>`<tr><td colspan="3">${esc(l.name)}</td></tr><tr><td>${l.qty} x ${Number(l.price).toFixed(2)}</td><td></td><td style="text-align:right">${(l.qty*l.price).toFixed(2)}</td></tr>`).join("")}</table>
+  --------------------------<br>${b.disc?`Discount: ${Number(b.disc).toFixed(2)}<br>`:""}<b>TOTAL: ${rs(b.total)}</b><br><div style="text-align:center;margin-top:8px">Thank you! Come again.</div>`;
+  setTimeout(()=>window.print(),150);
+}
+function renderBills(){
+  $("billBody").innerHTML=bills.map(b=>`<tr><td>${esc(b.no)}</td><td>${esc(b.date)}</td><td>${esc(b.name)}</td><td>${esc(b.bike)}</td><td>${rs(b.total)}</td><td><button class="b s g" onclick="printBill(bills.find(x=>x.id==='${b.id}'))">Reprint</button></td></tr>`).join("")||`<tr><td colspan="6">No bills yet.</td></tr>`;
+}
+
+// ---------- Bike service ----------
+async function addJob(){
+  const name=$("s_name").value.trim(),bike=$("s_bike").value.trim();
+  if(!name||!bike)return toast("Enter customer and bike number");
+  const job=await nextNo("job","JOB-",4);
+  await db.collection("jobs").add({job,name,phone:$("s_phone").value,bike,model:$("s_model").value,type:$("s_type").value,km:$("s_km").value,next:$("s_next").value,note:$("s_note").value,status:"Pending",date:today(),created:Date.now()});
+  ["s_name","s_phone","s_bike","s_km","s_next","s_note"].forEach(i=>$(i).value="");toast("Saved "+job);
+}
+function renderJobs(){
+  $("jobBody").innerHTML=jobs.map(j=>`<tr><td>${esc(j.date)}<br><small>${esc(j.job)}</small></td><td>${esc(j.name)}<br><small>${esc(j.phone)}</small></td><td>${esc(j.bike)}<br><small>${esc(j.model)} ${j.km?j.km+" km":""}</small></td><td>${esc(j.type)}<br><small>${esc(j.note)}</small></td><td>${esc(j.next)}</td>
+  <td><select onchange="setStatus('${j.id}',this.value)">${["Pending","Working","Done"].map(s=>`<option ${s===j.status?"selected":""}>${s}</option>`).join("")}</select></td>
+  <td><button class="b s" onclick="delJob('${j.id}')">Delete</button></td></tr>`).join("")||`<tr><td colspan="7">No service jobs yet.</td></tr>`;
+}
+const setStatus=(id,s)=>db.collection("jobs").doc(id).update({status:s});
+async function delJob(id){if(confirm("Delete this job?"))await db.collection("jobs").doc(id).delete()}
+</script>
+</body>
+</html>
