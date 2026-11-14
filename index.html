@@ -578,6 +578,10 @@
                     <button type="button" title="Add model" onclick="openListModal('models')" class="px-3 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-sm font-extrabold cursor-pointer">+</button>
                   </div>
                 </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Bill Entered By (Staff)</label>
+                  <input id="c_staff" placeholder="Staff name" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none">
+                </div>
                 <div id="c_svcWrap">
                   <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Service Type</label>
                   <div class="flex gap-1.5">
@@ -1328,6 +1332,7 @@ auth.onAuthStateChanged(u => {
 
   const displayName = u.displayName || u.email;
   $("who").textContent = displayName;
+  if (!$("c_staff").value) $("c_staff").value = u.displayName || u.email;
   $("userAvatar").textContent = displayName.charAt(0).toUpperCase();
   $("liveDate").textContent = new Date().toLocaleDateString("en-GB", { weekday: "short", day: "2-digit", month: "short", year: "numeric" });
   $("r_from").value = today().slice(0, 8) + "01";
@@ -1939,6 +1944,7 @@ async function saveBill(shouldPrint = true) {
         model: $("c_model").value || "",
         svcType: billMode === "bike" ? "Bike Sale" : ($("c_svc").value || ""),
         type: billMode,
+        staff: $("c_staff").value.trim() || auth.currentUser.displayName || auth.currentUser.email,
         sale,
         lines,
         disc,
@@ -2603,6 +2609,7 @@ function billPlainText(b) {
   L.push(`Customer: ${b.name || "Walk-in"}${b.phone ? " | Tel " + b.phone : ""}`);
   if (b.bike || b.model) L.push(`Bike: ${b.bike || "-"}${b.model ? " | " + b.model : ""}`);
   if (b.svcType) L.push(`Service: ${b.svcType}`);
+  if (b.staff) L.push(`Served by: ${b.staff}`);
   saleRows(b).forEach(([k, v]) => L.push(`${k}: ${v}`));
   L.push("Items:");
   (b.lines || []).forEach(l => L.push(`- ${l.name} x${l.qty} = ${(l.qty * l.price).toFixed(2)}`));
@@ -2626,7 +2633,7 @@ function makeQR(text) {
 function buildWhatsAppBillText(b) {
   const linesTxt = (b.lines || []).map(l => `• ${l.name} (${l.qty} x ${Number(l.price).toFixed(2)}) = Rs ${(l.qty * l.price).toFixed(2)}`).join("\n");
   const sale = saleRows(b).map(([k, v]) => `${k}: ${v}`).join("\n");
-  return `*${SHOP.name} — Sales & Service*\nTel: ${SHOP.phone}\nInvoice: *${b.no}*\nDate: ${b.date}\nCustomer: ${b.name}${b.bike ? `\nBike: ${b.bike}` : ""}${b.model ? `\nModel: ${b.model}` : ""}${b.svcType ? `\nService: ${b.svcType}` : ""}\n----------------------\n${linesTxt}\n----------------------${b.disc ? `\nDiscount: Rs ${Number(b.disc).toFixed(2)}` : ""}\n*TOTAL: ${rs(b.total)}*\nPayment: ${b.payMethod || "Cash"}${sale ? "\n----------------------\n" + sale : ""}\n\nThank you for choosing ${SHOP.name}!`;
+  return `*${SHOP.name} — Sales & Service*\nTel: ${SHOP.phone}\nInvoice: *${b.no}*\nDate: ${b.date}\nCustomer: ${b.name}${b.bike ? `\nBike: ${b.bike}` : ""}${b.model ? `\nModel: ${b.model}` : ""}${b.svcType ? `\nService: ${b.svcType}` : ""}${b.staff ? `\nServed by: ${b.staff}` : ""}\n----------------------\n${linesTxt}\n----------------------${b.disc ? `\nDiscount: Rs ${Number(b.disc).toFixed(2)}` : ""}\n*TOTAL: ${rs(b.total)}*\nPayment: ${b.payMethod || "Cash"}${sale ? "\n----------------------\n" + sale : ""}\n\nThank you for choosing ${SHOP.name}!`;
 }
 function printBill(b) {
   if (!b) return;
@@ -2646,6 +2653,7 @@ function printBill(b) {
     ${b.model ? `Model: ${esc(b.model)}<br>` : ""}
     ${b.svcType ? `Service: ${esc(b.svcType)}<br>` : ""}
     Pay Mode: ${esc(b.payMethod || "Cash")}<br>
+    ${b.staff ? `Served by: ${esc(b.staff)}<br>` : ""}
     ------------------------------
     <table style="width:100%">
       ${(b.lines || []).map(l => `
@@ -2675,6 +2683,7 @@ function viewBillDetail(id) {
       <div><span class="text-slate-400">Tel:</span> <b>${esc(b.phone || "-")}</b></div>
       <div><span class="text-slate-400">Bike:</span> <b>${esc(b.bike || "-")}</b></div>
       <div><span class="text-slate-400">Model:</span> <b>${esc(b.model || "-")}</b></div>
+      ${b.staff ? `<div class="col-span-2"><span class="text-slate-400">Entered by:</span> <b>${esc(b.staff)}</b></div>` : ""}
       ${b.svcType ? `<div class="col-span-2"><span class="text-slate-400">Service:</span> <b>${esc(b.svcType)}</b></div>` : ""}
     </div>
     <div class="divide-y divide-slate-100 dark:divide-slate-800 max-h-60 overflow-y-auto">
