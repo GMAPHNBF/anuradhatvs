@@ -885,18 +885,25 @@
       <!-- ==================== 5. BILL HISTORY SECTION ==================== -->
       <section id="bills" class="tab-section space-y-6">
         <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <div class="mb-4 space-y-3">
             <div>
               <h3 class="font-bold text-base text-slate-900 dark:text-white">Invoice &amp; POS Transaction Archive</h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">View details, reprint thermal receipts, share via WhatsApp, or void invoices</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Search by bill no, date, bike no, customer name or phone &mdash; then View, Print or Edit (edit needs password)</p>
             </div>
-            <div class="flex flex-wrap items-center gap-2">
-              <input id="billDateFilter" type="date" onchange="renderBills()" class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-xs focus:outline-none">
-              <div class="relative sm:w-64">
-                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-                <input id="billSearch" oninput="renderBills()" placeholder="Search bill no, customer, bike..." class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none">
+            <div class="grid grid-cols-2 lg:grid-cols-6 gap-2 items-end">
+              <div><label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Bill No</label><input id="bf_no" oninput="renderBills()" onkeydown="if(event.key==='Enter')searchAllBills()" placeholder="e.g. 0125" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></div>
+              <div><label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Date</label><input id="billDateFilter" type="date" onchange="renderBills()" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></div>
+              <div><label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Bike No</label><input id="bf_bike" oninput="renderBills()" onkeydown="if(event.key==='Enter')searchAllBills()" placeholder="e.g. BAB-1234" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none uppercase"></div>
+              <div><label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Customer Name</label><input id="bf_name" oninput="renderBills()" onkeydown="if(event.key==='Enter')searchAllBills()" placeholder="Customer name" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></div>
+              <div><label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Customer Phone</label><input id="bf_phone" inputmode="tel" oninput="renderBills()" onkeydown="if(event.key==='Enter')searchAllBills()" placeholder="07xxxxxxxx" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></div>
+              <div class="flex gap-2 col-span-2 lg:col-span-1">
+                <button id="bf_searchBtn" onclick="searchAllBills()" class="flex-1 px-3 py-2 rounded-xl bg-[#D90429] hover:bg-[#b80322] text-white text-sm font-bold cursor-pointer">Search</button>
+                <button onclick="resetBillSearch()" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer">Reset</button>
               </div>
-              <button onclick="$('billDateFilter').value='';$('billSearch').value='';renderBills()" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer">Reset</button>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+              <span id="billCount"></span>
+              <span>Typing filters the latest 300 bills instantly. Press <b>Search</b> / Enter to also look through older bills.</span>
             </div>
           </div>
 
@@ -1360,7 +1367,7 @@
       <h3 class="font-extrabold text-lg text-slate-900 dark:text-white" id="bdTitle">Invoice Details</h3>
       <button onclick="closeModal('billDetailModal')" class="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
     </div>
-    <div id="bdContent" class="text-sm space-y-3"></div>
+    <div id="bdContent" class="text-sm space-y-3 max-h-[65vh] overflow-y-auto pr-1"></div>
     <div class="flex justify-end gap-2 mt-6" id="bdActions"></div>
   </div>
 </div>
@@ -1409,6 +1416,75 @@
     <div class="flex justify-end gap-2 mt-5">
       <button onclick="closeModal('confirmModal')" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold cursor-pointer">Cancel</button>
       <button id="cfOkBtn" class="px-4 py-2 rounded-xl bg-[#D90429] text-white text-xs font-bold cursor-pointer">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit password modal -->
+<div id="pwModal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-950/65 backdrop-blur-xs p-4">
+  <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+    <div class="w-11 h-11 rounded-full bg-amber-500/15 text-amber-600 flex items-center justify-center mb-3"><i data-lucide="lock" class="w-5 h-5"></i></div>
+    <h3 class="font-extrabold text-base text-slate-900 dark:text-white">Password required</h3>
+    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">Enter the edit password to edit invoice <b id="pwBillNo" class="mono"></b>.</p>
+    <input id="pwInput" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter')submitEditPassword()" placeholder="Password" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none mt-3">
+    <p id="pwErr" class="hidden text-xs text-[#D90429] font-semibold mt-1.5">Wrong password. Please try again.</p>
+    <div class="flex justify-end gap-2 mt-5">
+      <button onclick="closeModal('pwModal')" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold cursor-pointer">Cancel</button>
+      <button onclick="submitEditPassword()" class="px-4 py-2 rounded-xl bg-[#D90429] text-white text-xs font-bold cursor-pointer">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bill edit modal -->
+<div id="billEditModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/65 backdrop-blur-xs p-4">
+  <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-3xl w-full p-6 shadow-2xl max-h-[92vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-extrabold text-lg text-slate-900 dark:text-white" id="beTitle">Edit Invoice</h3>
+      <button onclick="closeModal('billEditModal')" class="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <div id="beBikeNote" class="hidden mb-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-700 dark:text-amber-300">This is a bike sale invoice. Customer / bike details can be edited here; the amounts are locked because credit, RMV and leasing records depend on them.</div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div><label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Date</label><input id="be_date" type="date" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></div>
+      <div><label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Customer Name</label><input id="be_name" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></div>
+      <div><label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Phone</label><input id="be_phone" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></div>
+      <div><label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Bike No</label><input id="be_bike" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none uppercase"></div>
+      <div><label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Model</label><input id="be_model" list="be_models" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"><datalist id="be_models"></datalist></div>
+      <div><label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Service Type</label><input id="be_svc" list="be_svcs" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"><datalist id="be_svcs"></datalist></div>
+      <div><label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Payment</label><select id="be_pay" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></select></div>
+      <div><label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Staff</label><input id="be_staff" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></div>
+    </div>
+
+    <div class="mt-5">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Bill Items</span>
+        <button id="beAddLineBtn" onclick="addEditLine()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold cursor-pointer">+ Add custom line</button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead><tr class="text-[10px] font-bold uppercase tracking-wider text-slate-400"><th class="pb-1">Item</th><th class="pb-1 w-28">Price</th><th class="pb-1 w-20">Qty</th><th class="pb-1 w-28 text-right">Amount</th><th class="w-8"></th></tr></thead>
+          <tbody id="beLines" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mt-4 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+      <div class="sm:w-48"><label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Discount (Rs)</label><input id="be_disc" type="number" min="0" step="0.01" oninput="calcEdit()" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none"></div>
+      <div class="text-right">
+        <div class="text-xs text-slate-500">Subtotal: <b class="mono" id="beSub"></b></div>
+        <div class="text-lg font-extrabold mono text-[#D90429]" id="beTotal"></div>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Reason for edit <span class="text-[#D90429]">*</span></label>
+      <input id="be_reason" placeholder="Why is this bill being edited?" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none">
+    </div>
+    <label class="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer"><input type="checkbox" id="be_print" class="rounded text-[#D90429]"> Print updated receipt after saving</label>
+    <p class="text-[11px] text-slate-400 mt-2">Every edit is saved in the bill's Edit History with date, time, who edited it and what changed.</p>
+
+    <div class="flex justify-end gap-2 mt-5">
+      <button onclick="closeModal('billEditModal')" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold cursor-pointer">Cancel</button>
+      <button id="beSaveBtn" onclick="saveBillEdit()" class="px-5 py-2 rounded-xl bg-[#D90429] text-white text-xs font-bold cursor-pointer">Save Changes</button>
     </div>
   </div>
 </div>
@@ -2464,19 +2540,51 @@ function delJob(id) {
 }
 
 // ---------- 5. BILL HISTORY ----------
+let extraBills = [];            // older bills found through "Search"
+const EDIT_PASSWORD = "ANURADHATVS";
+const INP_CLS = "w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none";
+const allBills = () => {
+  const ids = new Set(bills.map(b => b.id));
+  return [...bills, ...extraBills.filter(b => !ids.has(b.id))].sort((a, b) => String(b.no || "").localeCompare(String(a.no || "")));
+};
+const findBill = id => allBills().find(x => x.id === id);
+const bfPhone = s => String(s || "").replace(/\D/g, "").replace(/^94/, "").replace(/^0+/, "");
+
+function billFilters() {
+  const g = id => ($(id)?.value || "").trim();
+  return { no: g("bf_no").toUpperCase(), dt: g("billDateFilter"), bike: normBike(g("bf_bike")), name: g("bf_name").toLowerCase(), ph: bfPhone(g("bf_phone")) };
+}
+function billMatches(b, f) {
+  if (f.dt && b.date !== f.dt) return false;
+  if (f.no) {
+    const digits = f.no.replace(/\D/g, "");
+    const bno = String(b.no || "").toUpperCase();
+    const ok = bno.includes(f.no) || (digits && !/[A-Z]/.test(f.no) && parseInt(bno.replace(/\D/g, ""), 10) === parseInt(digits, 10));
+    if (!ok) return false;
+  }
+  if (f.bike && !normBike(b.bike).includes(f.bike)) return false;
+  if (f.name && !String(b.name || "").toLowerCase().includes(f.name)) return false;
+  if (f.ph && !bfPhone(b.phone).includes(f.ph)) return false;
+  return true;
+}
+function resetBillSearch() {
+  ["bf_no", "billDateFilter", "bf_bike", "bf_name", "bf_phone"].forEach(i => { if ($(i)) $(i).value = ""; });
+  extraBills = [];
+  renderBills();
+}
+
 function renderBills() {
-  const q = ($("billSearch")?.value || "").toLowerCase();
-  const dt = $("billDateFilter")?.value || "";
+  if (!$("billBody")) return;
+  const f = billFilters();
+  const any = Object.values(f).some(Boolean);
+  const list = allBills().filter(b => billMatches(b, f));
+  if ($("billCount")) $("billCount").textContent = any ? `${list.length} bill(s) found` : `Showing latest ${list.length} bills`;
 
-  const filtered = bills.filter(b => {
-    const matchDt = !dt || b.date === dt;
-    const matchQ = ((b.no || "") + " " + (b.name || "") + " " + (b.bike || "") + " " + (b.phone || "")).toLowerCase().includes(q);
-    return matchDt && matchQ;
-  });
-
-  $("billBody").innerHTML = filtered.map(b => `
+  $("billBody").innerHTML = list.map(b => {
+    const n = (b.edits || []).length;
+    return `
     <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
-      <td class="py-3 px-3 mono font-bold text-xs text-[#D90429]">${esc(b.no)}</td>
+      <td class="py-3 px-3 mono font-bold text-xs text-[#D90429]">${esc(b.no)}${n ? `<div><span onclick="viewBillDetail('${b.id}')" title="View edit history" class="inline-block mt-1 px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 text-[10px] font-bold cursor-pointer">EDITED${n > 1 ? " x" + n : ""}</span></div>` : ""}</td>
       <td class="py-3 px-3 text-xs mono text-slate-600 dark:text-slate-300">${esc(b.date)}</td>
       <td class="py-3 px-3">
         <div class="font-bold text-slate-900 dark:text-white">${esc(b.name)}</div>
@@ -2490,16 +2598,232 @@ function renderBills() {
       <td class="py-3 px-3 text-right mono font-extrabold text-slate-900 dark:text-white">${rs(b.total)}</td>
       <td class="py-3 px-3 text-right whitespace-nowrap space-x-1">
         <button onclick="viewBillDetail('${b.id}')" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold cursor-pointer">View</button>
-        <button onclick="printBill(bills.find(x=>x.id==='${b.id}'))" class="px-2.5 py-1 rounded-lg bg-[#14213D] hover:bg-slate-700 text-white text-xs font-bold cursor-pointer">Print</button>
-        <button onclick="shareBillWhatsApp(bills.find(x=>x.id==='${b.id}'))" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer">WA</button>
+        <button onclick="printBill(findBill('${b.id}'))" class="px-2.5 py-1 rounded-lg bg-[#14213D] hover:bg-slate-700 text-white text-xs font-bold cursor-pointer">Print</button>
+        <button onclick="requestBillEdit('${b.id}')" class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold cursor-pointer">Edit</button>
+        <button onclick="shareBillWhatsApp(findBill('${b.id}'))" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer">WA</button>
         <button onclick="voidBill('${b.id}')" class="px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-[#D90429] text-xs font-bold cursor-pointer">Void</button>
       </td>
-    </tr>`).join("") || `<tr><td colspan="7" class="py-8 text-center text-slate-500">No invoices found.</td></tr>`;
+    </tr>`;
+  }).join("") || `<tr><td colspan="7" class="py-8 text-center text-slate-500">No invoices found. Press <b>Search</b> to look through older bills.</td></tr>`;
+}
+
+// Looks through ALL bills in the database (not only the latest 300)
+async function searchAllBills() {
+  const g = id => ($(id)?.value || "").trim();
+  const no = g("bf_no"), dt = g("billDateFilter"), bike = g("bf_bike"), name = g("bf_name"), ph = g("bf_phone");
+  if (!no && !dt && !bike && !name && !ph) return toast("Enter at least one search value");
+  const col = db.collection("bills"), qs = [];
+  const digits = no.replace(/\D/g, "");
+  if (digits) qs.push(col.where("no", "==", "BILL-" + digits.padStart(4, "0")));
+  if (dt) qs.push(col.where("date", "==", dt));
+  if (bike) { const u = bike.toUpperCase(); qs.push(col.where("bike", "==", u)); const nb = normBike(bike); if (nb !== u) qs.push(col.where("bike", "==", nb)); }
+  if (ph) qs.push(col.where("phone", "==", ph));
+  if (name) {
+    const cap = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+    [...new Set([name, name.toUpperCase(), name.toLowerCase(), cap])].forEach(v => qs.push(col.where("name", ">=", v).where("name", "<=", v + "\uf8ff")));
+  }
+  const btn = $("bf_searchBtn");
+  btn.disabled = true; btn.textContent = "Searching...";
+  try {
+    const snaps = await Promise.all(qs.map(q => q.limit(100).get()));
+    const map = new Map(extraBills.map(b => [b.id, b]));
+    snaps.forEach(sn => sn.docs.forEach(d => map.set(d.id, { id: d.id, ...d.data() })));
+    extraBills = [...map.values()];
+    renderBills();
+    toast(`${allBills().filter(b => billMatches(b, billFilters())).length} bill(s) found`);
+  } catch (e) { toast("Search failed: " + e.message); }
+  btn.disabled = false; btn.textContent = "Search";
+}
+
+// ---------- Edit history display ----------
+function billHistoryHtml(b) {
+  const ed = b.edits || [];
+  if (!ed.length) return "";
+  return `<div class="p-3 rounded-xl bg-amber-500/5 border border-amber-500/30 text-xs space-y-2">
+    <div class="font-bold text-amber-600 dark:text-amber-400">Edit History (${ed.length})</div>
+    ${[...ed].reverse().map(e => `
+      <div class="border-t border-amber-500/20 pt-2 first:border-0 first:pt-0">
+        <div class="flex justify-between gap-2"><b>${esc(new Date(e.at).toLocaleString("en-GB"))}</b><span class="text-slate-500">${esc(e.byName || e.by || "")}</span></div>
+        <div class="text-slate-500">Reason: <span class="text-slate-800 dark:text-slate-200 font-semibold">${esc(e.reason || "-")}</span></div>
+        <ul class="list-disc pl-4 mt-1 text-slate-600 dark:text-slate-300">${(e.changes || []).map(c => `<li>${esc(c)}</li>`).join("")}</ul>
+      </div>`).join("")}
+  </div>`;
+}
+
+// ---------- Password gate ----------
+let pendingEditId = null;
+function requestBillEdit(id) {
+  const b = findBill(id);
+  if (!b) return;
+  pendingEditId = id;
+  closeModal("billDetailModal");
+  $("pwBillNo").textContent = b.no;
+  $("pwInput").value = "";
+  $("pwErr").classList.add("hidden");
+  openModal("pwModal");
+  setTimeout(() => $("pwInput").focus(), 60);
+}
+function submitEditPassword() {
+  if ($("pwInput").value.trim() !== EDIT_PASSWORD) {
+    $("pwErr").classList.remove("hidden");
+    $("pwInput").value = "";
+    $("pwInput").focus();
+    return;
+  }
+  closeModal("pwModal");
+  $("pwInput").value = "";
+  openBillEdit(pendingEditId);
+}
+
+// ---------- Edit form ----------
+let billEd = null;
+const nameOf = x => typeof x === "string" ? x : ((x && (x.name || x.label)) || "");
+function openBillEdit(id) {
+  const b = findBill(id);
+  if (!b) return;
+  const bike = b.type === "bike";
+  billEd = { id, orig: JSON.parse(JSON.stringify(b)), bike, lines: (b.lines || []).map((l, i) => ({ ...JSON.parse(JSON.stringify(l)), _k: i })) };
+  $("beTitle").textContent = "Edit Invoice " + b.no;
+  $("beBikeNote").classList.toggle("hidden", !bike);
+  $("be_date").value = b.date || today();
+  $("be_name").value = b.name || "";
+  $("be_phone").value = b.phone || "";
+  $("be_bike").value = b.bike || "";
+  $("be_model").value = b.model || "";
+  $("be_svc").value = b.svcType || "";
+  $("be_staff").value = b.staff || "";
+  $("be_disc").value = Number(b.disc) || 0;
+  $("be_disc").disabled = bike;
+  $("beAddLineBtn").classList.toggle("hidden", bike);
+  $("be_reason").value = "";
+  $("be_print").checked = false;
+  $("be_models").innerHTML = (lists.models || []).map(m => `<option value="${esc(nameOf(m))}">`).join("");
+  $("be_svcs").innerHTML = (lists.services || []).map(m => `<option value="${esc(nameOf(m))}">`).join("");
+  const pays = ["Cash", "Card", "Bank Transfer / QR", "Credit / Pending"];
+  if (b.payMethod && !pays.includes(b.payMethod)) pays.push(b.payMethod);
+  $("be_pay").innerHTML = pays.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join("");
+  $("be_pay").value = b.payMethod || "Cash";
+  $("be_pay").disabled = bike;
+  renderEditLines();
+  openModal("billEditModal");
+}
+function renderEditLines() {
+  const lk = billEd.bike;
+  $("beLines").innerHTML = billEd.lines.map((l, i) => `
+    <tr>
+      <td class="py-1.5 pr-2">
+        <input value="${esc(l.name)}" ${l.id || lk ? "readonly" : ""} oninput="billEd.lines[${i}].name=this.value" placeholder="Item / labour description" class="${INP_CLS} ${l.id || lk ? "opacity-70" : ""}">
+        ${l.id ? `<div class="text-[10px] text-slate-400 mt-0.5">Stock item - changing qty also adjusts stock</div>` : ""}
+      </td>
+      <td class="py-1.5 pr-2"><input type="number" min="0" step="0.01" value="${Number(l.price) || 0}" ${lk ? "disabled" : ""} oninput="billEd.lines[${i}].price=+this.value||0;calcEdit()" class="${INP_CLS} mono"></td>
+      <td class="py-1.5 pr-2"><input type="number" min="1" step="1" value="${Number(l.qty) || 0}" ${lk ? "disabled" : ""} oninput="billEd.lines[${i}].qty=+this.value||0;calcEdit()" class="${INP_CLS} mono"></td>
+      <td class="py-1.5 text-right mono text-xs font-bold" id="beLt${i}"></td>
+      <td class="py-1.5 text-right">${lk ? "" : `<button onclick="billEd.lines.splice(${i},1);renderEditLines()" title="Remove line" class="text-slate-400 hover:text-[#D90429] cursor-pointer"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`}</td>
+    </tr>`).join("") || `<tr><td colspan="5" class="py-4 text-center text-xs text-slate-400">No items</td></tr>`;
+  calcEdit();
+  lucide.createIcons();
+}
+function calcEdit() {
+  if (!billEd) return;
+  billEd.lines.forEach((l, i) => { const e = $("beLt" + i); if (e) e.textContent = rs((Number(l.price) || 0) * (Number(l.qty) || 0)); });
+  if (billEd.bike) {
+    $("beSub").textContent = rs((billEd.orig.lines || []).reduce((a, l) => a + l.qty * l.price, 0));
+    $("beTotal").textContent = "Total: " + rs(billEd.orig.total);
+    return;
+  }
+  const subt = billEd.lines.reduce((a, l) => a + (Number(l.price) || 0) * (Number(l.qty) || 0), 0);
+  const disc = Math.min(subt, Math.max(0, +$("be_disc").value || 0));
+  $("beSub").textContent = rs(subt);
+  $("beTotal").textContent = "Total: " + rs(Math.max(0, subt - disc));
+}
+function addEditLine() {
+  billEd.lines.push({ id: null, name: "", price: 0, qty: 1, _k: null });
+  renderEditLines();
+  const inputs = $("beLines").querySelectorAll("tr");
+  const last = inputs[inputs.length - 1]?.querySelector("input");
+  if (last) last.focus();
+}
+
+async function saveBillEdit() {
+  if (!billEd) return;
+  const reason = $("be_reason").value.trim();
+  if (!reason) return toast("Please enter the reason for this edit");
+  const g = id => $(id).value.trim();
+  const o = billEd.orig;
+  const nv = { date: g("be_date") || o.date, name: g("be_name") || "Walk-in", phone: g("be_phone"), bike: g("be_bike").toUpperCase(), model: g("be_model"), svcType: g("be_svc"), payMethod: $("be_pay").value, staff: g("be_staff") };
+
+  let lines = o.lines || [], disc = Number(o.disc) || 0, total = Number(o.total) || 0;
+  const ch = [];
+  if (!billEd.bike) {
+    lines = billEd.lines.map(l => ({ ...l, name: String(l.name || "").trim(), price: Number(l.price) || 0, qty: Number(l.qty) || 0 }));
+    if (!lines.length) return toast("The bill needs at least one item");
+    if (lines.some(l => !l.name)) return toast("Every item needs a name");
+    if (lines.some(l => l.qty <= 0)) return toast("Quantity must be at least 1 (use the bin icon to remove an item)");
+    const subt = lines.reduce((a, l) => a + l.price * l.qty, 0);
+    disc = Math.min(subt, Math.max(0, +$("be_disc").value || 0));
+    total = Math.max(0, subt - disc);
+
+    // line-by-line change log
+    (o.lines || []).forEach((ol, i) => {
+      const nl = lines.find(l => l._k === i);
+      if (!nl) { ch.push(`Item removed: ${ol.name} (${ol.qty} x ${Number(ol.price).toFixed(2)})`); return; }
+      const d = [];
+      if (nl.name !== ol.name) d.push(`name "${ol.name}" → "${nl.name}"`);
+      if (Number(nl.price) !== Number(ol.price)) d.push(`price ${Number(ol.price).toFixed(2)} → ${nl.price.toFixed(2)}`);
+      if (Number(nl.qty) !== Number(ol.qty)) d.push(`qty ${ol.qty} → ${nl.qty}`);
+      if (d.length) ch.push(`${ol.name}: ${d.join(", ")}`);
+    });
+    lines.filter(l => l._k === null || l._k === undefined).forEach(l => ch.push(`Item added: ${l.name} (${l.qty} x ${l.price.toFixed(2)})`));
+    lines = lines.map(({ _k, ...rest }) => rest);
+    if (disc !== (Number(o.disc) || 0)) ch.push(`Discount: ${(Number(o.disc) || 0).toFixed(2)} → ${disc.toFixed(2)}`);
+  }
+  const lab = { date: "Date", name: "Customer", phone: "Phone", bike: "Bike No", model: "Model", svcType: "Service", payMethod: "Payment", staff: "Staff" };
+  Object.keys(lab).forEach(k => {
+    const a = String(o[k] ?? ""), b = String(nv[k] ?? "");
+    if (a !== b) ch.unshift(`${lab[k]}: ${a || "-"} → ${b || "-"}`);
+  });
+  if (total !== (Number(o.total) || 0)) ch.push(`Total: ${rs(o.total)} → ${rs(total)}`);
+  if (!ch.length) return toast("No changes were made");
+
+  const btn = $("beSaveBtn");
+  btn.disabled = true; btn.textContent = "Saving...";
+  try {
+    const entry = { at: Date.now(), date: today(), by: auth.currentUser.email || "", byName: auth.currentUser.displayName || "", reason, changes: ch, totalFrom: Number(o.total) || 0, totalTo: total };
+    const ref = db.collection("bills").doc(billEd.id);
+    const bike = billEd.bike;
+    const updated = await db.runTransaction(async t => {
+      const snap = await t.get(ref);
+      if (!snap.exists) throw new Error("This bill no longer exists");
+      const cur = snap.data();
+      // stock adjustment for stock-linked lines
+      const need = {};
+      if (!bike) {
+        (cur.lines || []).forEach(l => { if (l.id) need[l.id] = (need[l.id] || 0) - (Number(l.qty) || 0); });
+        lines.forEach(l => { if (l.id) need[l.id] = (need[l.id] || 0) + (Number(l.qty) || 0); });
+      }
+      const ids = Object.keys(need).filter(i => need[i] !== 0);
+      const docs = await Promise.all(ids.map(i => t.get(db.collection("items").doc(i))));
+      docs.forEach((d, i) => { if (d.exists && d.data().qty - need[ids[i]] < 0) throw new Error(`Not enough stock for ${d.data().name} (only ${d.data().qty} left)`); });
+      docs.forEach((d, i) => { if (d.exists) t.update(d.ref, { qty: d.data().qty - need[ids[i]] }); });
+      const patch = { ...nv, edits: [...(cur.edits || []), entry], edited: true, lastEditAt: entry.at };
+      if (!bike) Object.assign(patch, { lines, disc, total });
+      t.update(ref, patch);
+      return { ...cur, ...patch, id: billEd.id };
+    });
+    bills = bills.map(x => x.id === updated.id ? updated : x);
+    extraBills = extraBills.map(x => x.id === updated.id ? updated : x);
+    closeModal("billEditModal");
+    renderBills();
+    toast(`Invoice ${updated.no} updated`);
+    if ($("be_print").checked) printBill(updated);
+    billEd = null;
+  } catch (e) { toast(e.message); }
+  btn.disabled = false; btn.textContent = "Save Changes";
 }
 
 
 function voidBill(id) {
-  const b = bills.find(x => x.id === id);
+  const b = findBill(id);
   if (!b) return;
   askConfirm({
     title: `Void Invoice ${b.no}?`,
@@ -2519,6 +2843,8 @@ function voidBill(id) {
       }
       batch.delete(db.collection("bills").doc(id));
       await batch.commit();
+      extraBills = extraBills.filter(x => x.id !== id);
+      renderBills();
       toast(`Invoice ${b.no} voided` + (restore ? " & stock restored" : ""));
     }
   });
@@ -2894,7 +3220,7 @@ function buildWhatsAppBillText(b) {
   return `*${SHOP.name} — Sales & Service*\nTel: ${SHOP.phone}\nInvoice: *${b.no}*\nDate: ${b.date}\nCustomer: ${b.name}${b.bike ? `\nBike: ${b.bike}` : ""}${b.model ? `\nModel: ${b.model}` : ""}${b.svcType ? `\nService: ${b.svcType}` : ""}${b.staff ? `\nServed by: ${b.staff}` : ""}\n----------------------\n${linesTxt}\n----------------------${b.disc ? `\nDiscount: Rs ${Number(b.disc).toFixed(2)}` : ""}\n*TOTAL: ${rs(b.total)}*\nPayment: ${b.payMethod || "Cash"}${sale ? "\n----------------------\n" + sale : ""}\n\nThank you for choosing ${SHOP.name}!`;
 }
 function viewBillDetail(id) {
-  const b = bills.find(x => x.id === id);
+  const b = findBill(id);
   if (!b) return;
   $("bdTitle").textContent = `Invoice ${b.no}`;
   $("bdContent").innerHTML = `
@@ -2915,6 +3241,7 @@ function viewBillDetail(id) {
           <div class="mono font-bold">${rs(l.qty * l.price)}</div>
         </div>`).join("")}
     </div>
+    ${billHistoryHtml(b)}
     ${b.sale ? `<div class="p-3 rounded-xl bg-amber-500/5 border border-amber-500/20 text-xs space-y-1">${saleRows(b).map(([k, v]) => `<div class="flex justify-between gap-3"><span class="text-slate-500">${esc(k)}</span><b class="text-right">${esc(v)}</b></div>`).join("")}</div>` : ""}
     <div class="pt-2 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center">
       <span class="text-xs text-slate-500">Discount: ${rs(b.disc || 0)}</span>
@@ -2923,8 +3250,9 @@ function viewBillDetail(id) {
   `;
   $("bdActions").innerHTML = `
     <button onclick="closeModal('billDetailModal')" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold cursor-pointer">Close</button>
-    <button onclick="shareBillWhatsApp(bills.find(x=>x.id==='${b.id}'))" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold cursor-pointer">WhatsApp</button>
-    <button onclick="printBill(bills.find(x=>x.id==='${b.id}'))" class="px-4 py-2 rounded-xl bg-[#D90429] text-white text-xs font-bold cursor-pointer">Print Receipt</button>
+    <button onclick="requestBillEdit('${b.id}')" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold cursor-pointer">Edit</button>
+    <button onclick="shareBillWhatsApp(findBill('${b.id}'))" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold cursor-pointer">WhatsApp</button>
+    <button onclick="printBill(findBill('${b.id}'))" class="px-4 py-2 rounded-xl bg-[#D90429] text-white text-xs font-bold cursor-pointer">Print Receipt</button>
   `;
   openModal("billDetailModal");
 }
@@ -3249,6 +3577,7 @@ function printBill(b) {
   if (b.svcType) meta.push(["Service", esc(b.svcType)]);
   if (b.staff) meta.push(["Served by", esc(b.staff)]);
   meta.push(["Payment", esc(b.payMethod || "Cash")]);
+  if ((b.edits || []).length) meta.push(["Edited", esc(new Date(b.edits[b.edits.length - 1].at).toLocaleDateString("en-GB"))]);
   const sale = saleRows(b);
   const credit = b.sale && b.sale.creditBal > 0 ? b.sale.creditBal : 0;
   $("receipt").innerHTML = `<div style="font-family:${RC_FONT};font-size:12px;line-height:1.45;color:#000">
