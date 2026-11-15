@@ -1661,6 +1661,47 @@ async function register() {
   } catch (e) { x.textContent = e.message; }
 }
 
+// ---------- Auto log-out after 10 minutes of no activity ----------
+const IDLE_LIMIT_MS = 10 * 60 * 1000;   // log out after 10 min
+const IDLE_WARN_MS = 60 * 1000;         // warn during the last 60 sec
+let idleLast = Date.now(), idleTimer = null, idleBox = null;
+function idleReset() {
+  if (idleBox && !idleBox.classList.contains("hidden")) return;   // once warning is shown, only the button keeps the session
+  idleLast = Date.now();
+}
+function idleStay() {
+  idleLast = Date.now();
+  if (idleBox) idleBox.classList.add("hidden");
+}
+function idleCheck() {
+  if (!auth.currentUser) return;
+  const left = IDLE_LIMIT_MS - (Date.now() - idleLast);
+  if (left <= 0) return idleLogout();
+  if (left <= IDLE_WARN_MS) {
+    if (!idleBox) {
+      idleBox = document.createElement("div");
+      idleBox.className = "fixed bottom-5 right-5 z-[80] max-w-xs rounded-2xl bg-[#0B132B] text-white border border-[#D90429] shadow-2xl p-4 hidden";
+      idleBox.innerHTML = '<div class="font-bold text-sm">Still there?</div><div class="text-xs text-slate-300 mt-1">You will be logged out in <b id="idleSec" class="mono"></b> seconds because of no activity.</div><button onclick="idleStay()" class="mt-3 px-4 py-2 rounded-xl bg-[#D90429] text-white text-xs font-bold cursor-pointer">Stay logged in</button>';
+      document.body.appendChild(idleBox);
+    }
+    idleBox.classList.remove("hidden");
+    $("idleSec").textContent = Math.ceil(left / 1000);
+  }
+}
+function idleLogout() {
+  if (idleBox) idleBox.classList.add("hidden");
+  document.querySelectorAll('[id$="Modal"]').forEach(m => { m.classList.add("hidden"); m.classList.remove("flex"); });
+  billEd = null; pendingEditId = null; extraBills = [];
+  auth.signOut().then(() => toast("Logged out automatically (10 min no activity)"));
+}
+["mousemove", "mousedown", "keydown", "touchstart", "scroll", "wheel", "click"].forEach(ev => document.addEventListener(ev, idleReset, { passive: true, capture: true }));
+document.addEventListener("visibilitychange", () => { if (!document.hidden) idleCheck(); });
+auth.onAuthStateChanged(u => {
+  clearInterval(idleTimer);
+  if (idleBox) idleBox.classList.add("hidden");
+  if (u) { idleLast = Date.now(); idleTimer = setInterval(idleCheck, 1000); }
+});
+
 auth.onAuthStateChanged(u => {
   unsubs.forEach(f => f()); unsubs = [];
   if (attUnsub) { attUnsub(); attUnsub = null; } attMonth = ""; attRows = [];
