@@ -327,6 +327,13 @@
       <button data-t="reports" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer">
         <span class="flex items-center gap-3"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Analytics &amp; Reports</span>
       </button>
+
+      <div class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Admin</div>
+
+      <button data-t="admin" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer">
+        <span class="flex items-center gap-3"><i data-lucide="shield-check" class="w-4 h-4"></i> Admin Panel</span>
+        <i data-lucide="lock" class="w-3.5 h-3.5 text-slate-500"></i>
+      </button>
     </div>
 
     <!-- User Footer -->
@@ -338,7 +345,7 @@
           <div class="text-[11px] text-emerald-400 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span> Online</div>
         </div>
       </div>
-      <button onclick="auth.signOut()" class="w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-red-600/20 text-slate-300 hover:text-red-300 border border-white/10 text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer">
+      <button onclick="doLogout()" class="w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-red-600/20 text-slate-300 hover:text-red-300 border border-white/10 text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer">
         <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sign Out
       </button>
     </div>
@@ -891,6 +898,76 @@
       </section>
 
       <!-- ==================== 5. BILL HISTORY SECTION ==================== -->
+      <section id="admin" class="tab-section space-y-6">
+        <div id="adLockBox" class="max-w-sm mx-auto mt-10 bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-lg text-center">
+          <div class="w-14 h-14 mx-auto rounded-full bg-[#D90429]/10 text-[#D90429] flex items-center justify-center mb-4"><i data-lucide="shield-check" class="w-7 h-7"></i></div>
+          <h3 class="font-extrabold text-lg text-slate-900 dark:text-white">Admin Panel Locked</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-4">Enter the admin password to continue</p>
+          <input id="ad_pw" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Admin password" onkeydown="if(event.key==='Enter')unlockAdmin()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-sm focus:ring-2 focus:ring-[#D90429] focus:outline-none">
+          <p id="adErr" class="hidden text-xs text-[#D90429] font-semibold mt-2">Wrong password.</p>
+          <button onclick="unlockAdmin()" class="mt-3 w-full py-2.5 rounded-xl bg-[#D90429] hover:bg-[#B00321] text-white font-bold text-sm cursor-pointer">Unlock</button>
+        </div>
+
+        <div id="adContent" class="hidden space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 class="font-extrabold text-lg text-slate-900 dark:text-white">Admin Panel</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Live data: who logged in, from where, who is online now. Block or log out any user.</p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="adExport()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer">Export Excel</button>
+              <button onclick="adminLock()" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold cursor-pointer">Lock</button>
+            </div>
+          </div>
+
+          <div id="adStats" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+
+          <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <div>
+                <h3 class="font-bold text-base text-slate-900 dark:text-white">Users &amp; Access</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Everyone who has logged in to this system</p>
+              </div>
+              <input id="ad_uq" oninput="renderAdmin()" placeholder="Search name / email..." class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-xs focus:outline-none focus:ring-2 focus:ring-[#D90429] sm:w-64">
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead><tr class="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-50/70 dark:bg-slate-900/50">
+                  <th class="py-3 px-3">User</th><th class="py-3 px-3">Method</th><th class="py-3 px-3">Status</th><th class="py-3 px-3">Last Login</th><th class="py-3 px-3">Device</th><th class="py-3 px-3 text-right">Logins</th><th class="py-3 px-3">First Login</th><th class="py-3 px-3 text-right">Actions</th>
+                </tr></thead>
+                <tbody id="adUsersBody" class="divide-y divide-slate-100 dark:divide-slate-800/80 text-sm"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4">
+              <div>
+                <h3 class="font-bold text-base text-slate-900 dark:text-white">Login Activity</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400" id="adLogCount"></p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <input id="ad_lq" oninput="renderAdmin()" placeholder="Search user / IP / place..." class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-xs focus:outline-none focus:ring-2 focus:ring-[#D90429]">
+                <select id="ad_lev" onchange="renderAdmin()" class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-xs focus:outline-none focus:ring-2 focus:ring-[#D90429]">
+                  <option value="">All events</option><option value="login">Login</option><option value="logout">Logout</option><option value="auto-logout">Auto logout</option><option value="admin-pw-failed">Wrong admin password</option>
+                </select>
+                <input id="ad_ldt" type="date" onchange="renderAdmin()" class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 text-xs focus:outline-none focus:ring-2 focus:ring-[#D90429]">
+                <button onclick="$('ad_lq').value='';$('ad_lev').value='';$('ad_ldt').value='';renderAdmin()" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold cursor-pointer">Reset</button>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead><tr class="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-50/70 dark:bg-slate-900/50">
+                  <th class="py-3 px-3">Time</th><th class="py-3 px-3">User</th><th class="py-3 px-3">Event</th><th class="py-3 px-3">Method</th><th class="py-3 px-3">IP Address</th><th class="py-3 px-3">Location</th><th class="py-3 px-3">Network (ISP)</th><th class="py-3 px-3">Device</th>
+                </tr></thead>
+                <tbody id="adLogBody" class="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs"></tbody>
+              </table>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-400">Location is approximate (from the IP address). "Block" stops a user from using this system; to delete the login account itself, remove it in Firebase console &rarr; Authentication &rarr; Users.</p>
+        </div>
+      </section>
+
       <section id="bills" class="tab-section space-y-6">
         <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
           <div class="mb-4 space-y-3">
@@ -1603,7 +1680,8 @@ const PAGE_META = {
   att: ["Attendance", "Daily attendance, leave and overtime for every employee"],
   payroll: ["Payroll & Salary", "Monthly salary, EPF / ETF, advances and payslips"],
   bikesale: ["Brand New Bike Sale", "Cash or leasing sale, RMV, down payment & customer credit"],
-  dues: ["Credit & Dues", "Customers who owe credit or RMV fees - search by NIC, collect later"]
+  dues: ["Credit & Dues", "Customers who owe credit or RMV fees - search by NIC, collect later"],
+  admin: ["Admin Panel", "Who logged in, from where, who is online now & access control"]
 };
 
 function switchTab(t) {
@@ -1629,6 +1707,8 @@ function switchTab(t) {
   if (t === "dues") renderDues();
   if (t === "bikesale") renderBS();
   if (t === "emp") renderEmps();
+  if (t !== "admin" && adminUnlocked) adminLock();
+  if (t === "admin") applyAdminLock();
   if (t !== "att" && attUnlocked) lockAtt();
   if (t === "att") { applyAttLock(); if (attUnlocked) renderAttendance(); }
   if (t === "payroll") initPayroll();
@@ -1699,6 +1779,256 @@ async function register() {
   } catch (e) { x.textContent = e.message; }
 }
 
+// =====================================================================
+//  ADMIN PANEL  (login tracking, online users, block / force log-out)
+// =====================================================================
+const ADMIN_PASSWORD = "ANURADHATVS1985";
+let adminUnlocked = false, adUsers = [], adLogs = [], adUnsubs = [], adTimer = null;
+let adNetCache = null;
+
+function adDevice() {
+  const ua = navigator.userAgent || "";
+  let browser = "Browser", os = "Unknown";
+  if (/Edg\//.test(ua)) browser = "Edge"; else if (/OPR\/|Opera/.test(ua)) browser = "Opera"; else if (/Chrome\//.test(ua)) browser = "Chrome"; else if (/Firefox\//.test(ua)) browser = "Firefox"; else if (/Safari\//.test(ua)) browser = "Safari";
+  if (/Android/.test(ua)) os = "Android"; else if (/iPhone|iPad|iPod/.test(ua)) os = "iOS"; else if (/Windows/.test(ua)) os = "Windows"; else if (/Mac OS X/.test(ua)) os = "macOS"; else if (/Linux/.test(ua)) os = "Linux";
+  const type = /iPad|Tablet/.test(ua) ? "Tablet" : /Mobi|Android|iPhone/.test(ua) ? "Mobile" : "Desktop";
+  let tz = ""; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (e) {}
+  return { browser, os, type, screen: (screen.width || 0) + "x" + (screen.height || 0), tz, lang: navigator.language || "" };
+}
+async function adNet() {
+  if (adNetCache) return adNetCache;
+  const out = { ip: "", city: "", country: "", isp: "" };
+  const get = async url => { const c = new AbortController(); const t = setTimeout(() => c.abort(), 5000); try { return await (await fetch(url, { signal: c.signal })).json(); } finally { clearTimeout(t); } };
+  try {
+    const j = await get("https://ipwho.is/");
+    if (j && j.success !== false && j.ip) { out.ip = j.ip; out.city = j.city || ""; out.country = j.country || ""; out.isp = (j.connection && (j.connection.isp || j.connection.org)) || ""; }
+  } catch (e) {}
+  if (!out.ip) { try { const j = await get("https://api.ipify.org?format=json"); out.ip = j.ip || ""; } catch (e) {} }
+  if (out.ip) adNetCache = out;
+  return out;
+}
+const adMethod = u => ((u.providerData && u.providerData[0] && u.providerData[0].providerId) === "google.com") ? "Google" : "Email";
+function adLogDoc(u, event, net, dev) {
+  return { uid: u.uid, email: u.email || "", name: u.displayName || u.email || "", event, method: adMethod(u), at: Date.now(), ip: net.ip || "", city: net.city || "", country: net.country || "", isp: net.isp || "", device: `${dev.browser} / ${dev.os} / ${dev.type}`, screen: dev.screen, tz: dev.tz, lang: dev.lang };
+}
+
+// called when someone signs in (or re-opens the app while still signed in)
+async function adRecordSession(u) {
+  try {
+    let fresh = true;
+    try { fresh = sessionStorage.getItem("tvs_sess_" + u.uid) !== "1"; sessionStorage.setItem("tvs_sess_" + u.uid, "1"); } catch (e) {}
+    const ref = db.collection("users").doc(u.uid);
+    const snap = await ref.get();
+    if (snap.exists && snap.data().blocked) {
+      await auth.signOut();
+      $("msg").textContent = "Your access has been blocked by the admin.";
+      return;
+    }
+    const base = { uid: u.uid, email: u.email || "", name: u.displayName || u.email || "", method: adMethod(u), photo: u.photoURL || "", lastSeen: Date.now(), online: true };
+    if (!snap.exists) base.firstLogin = Date.now();
+    if (fresh) {
+      const net = await adNet(), dev = adDevice();
+      Object.assign(base, { lastLogin: Date.now(), lastIp: net.ip, lastLocation: [net.city, net.country].filter(Boolean).join(", "), lastIsp: net.isp, lastDevice: `${dev.browser} / ${dev.os} / ${dev.type}`, loginCount: firebase.firestore.FieldValue.increment(1) });
+      await ref.set(base, { merge: true });
+      await db.collection("loginLogs").add(adLogDoc(u, "login", net, dev));
+    } else {
+      await ref.set(base, { merge: true });
+    }
+  } catch (e) { console.warn("Admin tracking:", e.message); }
+}
+async function logAuthEvent(event) {
+  const u = auth.currentUser;
+  if (!u) return;
+  try {
+    const net = adNetCache || {}, dev = adDevice();
+    await Promise.all([
+      db.collection("loginLogs").add(adLogDoc(u, event, net, dev)),
+      db.collection("users").doc(u.uid).set({ online: false, lastSeen: Date.now() }, { merge: true })
+    ]);
+    try { sessionStorage.removeItem("tvs_sess_" + u.uid); } catch (e) {}
+  } catch (e) {}
+}
+async function doLogout() { await logAuthEvent("logout"); auth.signOut(); }
+
+// keeps "online" status fresh + obeys block / force-logout from the admin
+let adHbTimer = null, adSelfUnsub = null;
+function adHeartbeat() {
+  const u = auth.currentUser;
+  if (!u || document.hidden) return;
+  db.collection("users").doc(u.uid).set({ lastSeen: Date.now(), online: true }, { merge: true }).catch(() => {});
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) adHeartbeat(); });
+auth.onAuthStateChanged(u => {
+  clearInterval(adHbTimer);
+  if (adSelfUnsub) { adSelfUnsub(); adSelfUnsub = null; }
+  adminLock(true);
+  if (!u) return;
+  adRecordSession(u);
+  adHbTimer = setInterval(adHeartbeat, 60000);
+  adSelfUnsub = db.collection("users").doc(u.uid).onSnapshot(d => {
+    const x = d.data();
+    if (!x) return;
+    if (x.blocked) { auth.signOut().then(() => { $("msg").textContent = "Your access has been blocked by the admin."; }); }
+    else if (x.forceLogout) {
+      d.ref.set({ forceLogout: false }, { merge: true }).catch(() => {});
+      logAuthEvent("logout").then(() => auth.signOut()).then(() => { $("msg").textContent = "You were logged out by the admin."; });
+    }
+  }, () => {});
+});
+
+// ---------- admin panel: lock / unlock ----------
+function applyAdminLock() {
+  if (!$("adLockBox")) return;
+  $("adLockBox").classList.toggle("hidden", adminUnlocked);
+  $("adContent").classList.toggle("hidden", !adminUnlocked);
+  if (!adminUnlocked) setTimeout(() => { const el = $("ad_pw"); if (el && el.offsetParent) el.focus(); }, 60);
+  lucide.createIcons();
+}
+function unlockAdmin() {
+  const v = $("ad_pw").value.trim();
+  $("ad_pw").value = "";
+  if (v === ADMIN_PASSWORD) {
+    adminUnlocked = true;
+    $("adErr").classList.add("hidden");
+    applyAdminLock();
+    adStart();
+    toast("Admin panel unlocked");
+  } else {
+    $("adErr").classList.remove("hidden");
+    const u = auth.currentUser;
+    if (u) adLogDoc && db.collection("loginLogs").add(adLogDoc(u, "admin-pw-failed", adNetCache || {}, adDevice())).catch(() => {});
+  }
+}
+function adminLock() {
+  adminUnlocked = false;
+  adUnsubs.forEach(f => f()); adUnsubs = [];
+  clearInterval(adTimer);
+  adUsers = []; adLogs = [];
+  applyAdminLock();
+}
+function adStart() {
+  adUnsubs.forEach(f => f()); adUnsubs = [];
+  adUnsubs.push(db.collection("users").onSnapshot(sn => { adUsers = sn.docs.map(d => ({ id: d.id, ...d.data() })); renderAdmin(); }, e => toast("Cannot read users: " + e.message)));
+  adUnsubs.push(db.collection("loginLogs").orderBy("at", "desc").limit(500).onSnapshot(sn => { adLogs = sn.docs.map(d => ({ id: d.id, ...d.data() })); renderAdmin(); }, e => toast("Cannot read login log: " + e.message)));
+  clearInterval(adTimer);
+  adTimer = setInterval(renderAdmin, 30000);
+}
+
+// ---------- admin panel: display ----------
+const adOnline = u => u.online !== false && u.lastSeen && (Date.now() - u.lastSeen) < 150000 && !u.blocked;
+const adFmt = ms => ms ? new Date(ms).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "-";
+const adDay = ms => new Date(ms - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+function adAgo(ms) {
+  if (!ms) return "never";
+  const s = Math.max(0, Math.round((Date.now() - ms) / 1000));
+  if (s < 60) return "just now";
+  const m = Math.round(s / 60); if (m < 60) return m + " min ago";
+  const h = Math.round(m / 60); if (h < 24) return h + " h ago";
+  return Math.round(h / 24) + " d ago";
+}
+const AD_EV = {
+  "login": ["Login", "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"],
+  "logout": ["Logout", "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300"],
+  "auto-logout": ["Auto logout", "bg-amber-500/15 text-amber-600 dark:text-amber-400"],
+  "admin-pw-failed": ["Wrong admin password", "bg-red-500/15 text-[#D90429]"]
+};
+function renderAdmin() {
+  if (!adminUnlocked || !$("adUsersBody")) return;
+  const me = auth.currentUser ? auth.currentUser.uid : "";
+  const td = adDay(Date.now());
+
+  // stat cards
+  const card = (label, val, cls = "") => `<div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-4"><div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">${label}</div><div class="text-2xl font-extrabold mono mt-1 ${cls}">${val}</div></div>`;
+  $("adStats").innerHTML =
+    card("Total users", adUsers.length) +
+    card("Online now", adUsers.filter(adOnline).length, "text-emerald-500") +
+    card("Logins today", adLogs.filter(l => l.event === "login" && adDay(l.at) === td).length) +
+    card("Blocked", adUsers.filter(u => u.blocked).length, "text-[#D90429]");
+
+  // users
+  const uq = ($("ad_uq").value || "").toLowerCase().trim();
+  const users = adUsers
+    .filter(u => !uq || ((u.name || "") + " " + (u.email || "")).toLowerCase().includes(uq))
+    .sort((a, b) => (adOnline(b) ? 1 : 0) - (adOnline(a) ? 1 : 0) || (b.lastSeen || 0) - (a.lastSeen || 0));
+  $("adUsersBody").innerHTML = users.map(u => {
+    const on = adOnline(u), self = u.id === me;
+    return `<tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition ${u.blocked ? "opacity-70" : ""}">
+      <td class="py-3 px-3"><div class="font-bold text-slate-900 dark:text-white">${esc(u.name || "-")}${self ? ' <span class="ml-1 px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-600 text-[10px] font-bold">YOU</span>' : ""}</div><div class="text-[11px] text-slate-500">${esc(u.email || "")}</div></td>
+      <td class="py-3 px-3 text-xs">${esc(u.method || "-")}</td>
+      <td class="py-3 px-3 text-xs whitespace-nowrap">${u.blocked ? '<span class="px-2 py-0.5 rounded-md bg-red-500/15 text-[#D90429] font-bold text-[10px]">BLOCKED</span>' : on ? '<span class="inline-flex items-center gap-1.5 font-bold text-emerald-500"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>Online</span>' : `<span class="text-slate-500">Offline<div class="text-[10px]">${esc(adAgo(u.lastSeen))}</div></span>`}</td>
+      <td class="py-3 px-3 text-xs"><div class="font-semibold">${esc(adFmt(u.lastLogin))}</div><div class="text-[11px] text-slate-500">${esc(u.lastLocation || "-")}</div><div class="text-[11px] mono text-slate-400">${esc(u.lastIp || "")}</div></td>
+      <td class="py-3 px-3 text-xs text-slate-600 dark:text-slate-300">${esc(u.lastDevice || "-")}</td>
+      <td class="py-3 px-3 text-right mono font-bold text-xs">${Number(u.loginCount) || 0}</td>
+      <td class="py-3 px-3 text-xs text-slate-500 whitespace-nowrap">${esc(adFmt(u.firstLogin))}</td>
+      <td class="py-3 px-3 text-right whitespace-nowrap space-x-1">${self ? '<span class="text-[11px] text-slate-400">-</span>' : `
+        ${on ? `<button onclick="adForceLogout('${u.id}')" class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold cursor-pointer">Log out</button>` : ""}
+        <button onclick="adToggleBlock('${u.id}')" class="px-2.5 py-1 rounded-lg ${u.blocked ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-red-500/10 hover:bg-red-500/20 text-[#D90429]"} text-xs font-bold cursor-pointer">${u.blocked ? "Unblock" : "Block"}</button>
+        <button onclick="adDeleteUser('${u.id}')" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold cursor-pointer">Remove</button>`}
+      </td></tr>`;
+  }).join("") || `<tr><td colspan="8" class="py-8 text-center text-slate-500">No users recorded yet. Each person appears here after their next login.</td></tr>`;
+
+  // login log
+  const lq = ($("ad_lq").value || "").toLowerCase().trim(), lev = $("ad_lev").value, ldt = $("ad_ldt").value;
+  const logs = adLogs.filter(l =>
+    (!lev || l.event === lev) && (!ldt || adDay(l.at) === ldt) &&
+    (!lq || ((l.name || "") + " " + (l.email || "") + " " + (l.ip || "") + " " + (l.city || "") + " " + (l.country || "")).toLowerCase().includes(lq)));
+  $("adLogCount").textContent = `${logs.length} record(s) shown (latest 500 kept in view)`;
+  $("adLogBody").innerHTML = logs.map(l => {
+    const ev = AD_EV[l.event] || [l.event, "bg-slate-200 text-slate-600"];
+    return `<tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
+      <td class="py-2.5 px-3 whitespace-nowrap mono">${esc(adFmt(l.at))}</td>
+      <td class="py-2.5 px-3"><div class="font-bold text-slate-900 dark:text-white">${esc(l.name || "-")}</div><div class="text-[11px] text-slate-500">${esc(l.email || "")}</div></td>
+      <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-md text-[10px] font-bold whitespace-nowrap ${ev[1]}">${esc(ev[0])}</span></td>
+      <td class="py-2.5 px-3">${esc(l.method || "-")}</td>
+      <td class="py-2.5 px-3 mono">${esc(l.ip || "-")}</td>
+      <td class="py-2.5 px-3">${esc([l.city, l.country].filter(Boolean).join(", ") || "-")}</td>
+      <td class="py-2.5 px-3 text-slate-500">${esc(l.isp || "-")}</td>
+      <td class="py-2.5 px-3 text-slate-600 dark:text-slate-300">${esc(l.device || "-")}<div class="text-[10px] text-slate-400">${esc(l.screen || "")} ${esc(l.tz || "")}</div></td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="8" class="py-8 text-center text-slate-500">No login records found.</td></tr>`;
+}
+
+// ---------- admin panel: actions ----------
+function adToggleBlock(id) {
+  const u = adUsers.find(x => x.id === id);
+  if (!u) return;
+  askConfirm({
+    title: u.blocked ? `Unblock ${u.name || u.email}?` : `Block ${u.name || u.email}?`,
+    message: u.blocked ? "This person will be able to log in again." : "This person will be logged out immediately and cannot use the system until you unblock them.",
+    onConfirm: async () => {
+      try {
+        await db.collection("users").doc(id).set(u.blocked ? { blocked: false, blockedAt: 0, blockedBy: "" } : { blocked: true, blockedAt: Date.now(), blockedBy: auth.currentUser.email || "" }, { merge: true });
+        toast(u.blocked ? "User unblocked" : "User blocked");
+      } catch (e) { toast(e.message); }
+    }
+  });
+}
+function adForceLogout(id) {
+  const u = adUsers.find(x => x.id === id);
+  if (!u) return;
+  askConfirm({
+    title: `Log out ${u.name || u.email}?`,
+    message: "They will be signed out right now. They can log in again.",
+    onConfirm: async () => { try { await db.collection("users").doc(id).set({ forceLogout: true }, { merge: true }); toast("Log-out sent"); } catch (e) { toast(e.message); } }
+  });
+}
+function adDeleteUser(id) {
+  const u = adUsers.find(x => x.id === id);
+  if (!u) return;
+  askConfirm({
+    title: `Remove ${u.name || u.email} from this list?`,
+    message: "This removes the record from the admin list only. The login account stays in Firebase (delete it in Firebase console, Authentication, Users, to remove it fully). If they log in again they will reappear here.",
+    onConfirm: async () => { try { await db.collection("users").doc(id).delete(); toast("Record removed"); } catch (e) { toast(e.message); } }
+  });
+}
+function adExport() {
+  if (!adUsers.length && !adLogs.length) return toast("Nothing to export yet");
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(adUsers.map(u => ({ Name: u.name, Email: u.email, Method: u.method, Status: u.blocked ? "Blocked" : adOnline(u) ? "Online" : "Offline", "Last seen": adFmt(u.lastSeen), "Last login": adFmt(u.lastLogin), "Last IP": u.lastIp || "", "Last location": u.lastLocation || "", "Last device": u.lastDevice || "", "Login count": Number(u.loginCount) || 0, "First login": adFmt(u.firstLogin) }))), "Users");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(adLogs.map(l => ({ Time: adFmt(l.at), Name: l.name, Email: l.email, Event: (AD_EV[l.event] || [l.event])[0], Method: l.method, IP: l.ip, City: l.city, Country: l.country, ISP: l.isp, Device: l.device, Screen: l.screen, Timezone: l.tz }))), "Login Log");
+  XLSX.writeFile(wb, "ANURADHA_TVS_Users_Logins_" + today() + ".xlsx");
+}
+
 // ---------- Auto log-out after 10 minutes of no activity ----------
 const IDLE_LIMIT_MS = 10 * 60 * 1000;   // log out after 10 min
 const IDLE_WARN_MS = 60 * 1000;         // warn during the last 60 sec
@@ -1727,17 +2057,19 @@ function idleCheck() {
   }
 }
 function idleLogout() {
+  if (window._idleOut) return;
+  window._idleOut = true;
   if (idleBox) idleBox.classList.add("hidden");
   document.querySelectorAll('[id$="Modal"]').forEach(m => { m.classList.add("hidden"); m.classList.remove("flex"); });
   billEd = null; pendingEditId = null; extraBills = [];
-  auth.signOut().then(() => toast("Logged out automatically (10 min no activity)"));
+  logAuthEvent("auto-logout").then(() => auth.signOut()).then(() => toast("Logged out automatically (10 min no activity)"));
 }
 ["mousemove", "mousedown", "keydown", "touchstart", "scroll", "wheel", "click"].forEach(ev => document.addEventListener(ev, idleReset, { passive: true, capture: true }));
 document.addEventListener("visibilitychange", () => { if (!document.hidden) idleCheck(); });
 auth.onAuthStateChanged(u => {
   clearInterval(idleTimer);
   if (idleBox) idleBox.classList.add("hidden");
-  if (u) { idleLast = Date.now(); idleTimer = setInterval(idleCheck, 1000); }
+  if (u) { window._idleOut = false; idleLast = Date.now(); idleTimer = setInterval(idleCheck, 1000); }
 });
 
 auth.onAuthStateChanged(u => {
