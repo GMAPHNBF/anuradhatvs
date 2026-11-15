@@ -400,7 +400,7 @@
         </div>
 
         <!-- KPI Summary Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4" id="dashKpis">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4" id="dashKpis">
           <!-- Populated dynamically -->
         </div>
 
@@ -1440,6 +1440,7 @@ const auth = firebase.auth(), db = firebase.firestore();
 
 let items = [], bills = [], jobs = [], petty = [], cart = [], unsubs = [];
 let dues = [], bsKind = 'cash';
+let attToday = [];
 let stockCatFilter = 'ALL', stockLowOnly = false, jobStatusFilter = 'ALL', discMode = 'rs';
 let salesChartInstance = null, catChartInstance = null;
 
@@ -1645,9 +1646,14 @@ auth.onAuthStateChanged(u => {
     renderDues();
   }, e => toast("Dues: " + e.message)));
 
+  unsubs.push(db.collection("attendance").where("date", "==", today()).onSnapshot(sn => {
+    attToday = sn.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderDashboard();
+  }, e => console.warn("Attendance (dashboard): " + e.message)));
+
   unsubs.push(db.collection("employees").limit(300).onSnapshot(sn => {
     emps = sn.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.code || "").localeCompare(b.code || ""));
-    fillEmpSelects(); refreshStaff();
+    fillEmpSelects(); refreshStaff(); renderDashboard();
   }, e => toast("Employees: " + e.message)));
   unsubs.push(db.collection("advances").limit(500).onSnapshot(sn => {
     advs = sn.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.created || 0) - (a.created || 0));
@@ -1709,7 +1715,43 @@ function renderDashboard() {
   const lowStockItems = items.filter(i => i.qty <= i.min);
   const invValue = items.reduce((a, i) => a + (Number(i.price || 0) * Number(i.qty || 0)), 0);
 
+  // Today's bikes sold / bikes serviced / staff at work
+  const bikesSoldToday = bills.filter(b => b.date === td && b.type === "bike").length;
+  const servicedToday = jobs.filter(j => j.status === "Done" && (j.doneDate || (j.created ? new Date(j.created).toISOString().slice(0, 10) : "")) === td).length;
+  const activeEmps = emps.filter(e => e.status !== "Left");
+  const presentToday = attToday.filter(r => r.status === "Present").length;
+  const halfToday = attToday.filter(r => r.status === "Half Day").length;
+  const cameToWork = presentToday + halfToday;
+  const absentToday = attToday.filter(r => ["Absent", "Paid Leave", "No-Pay Leave"].includes(r.status)).length;
+
   $("dashKpis").innerHTML = `
+    <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+      <div class="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
+        <span>BIKES SOLD TODAY</span>
+        <span class="p-1.5 rounded-lg bg-[#D90429]/10 text-[#D90429]"><i data-lucide="bike" class="w-4 h-4"></i></span>
+      </div>
+      <div class="text-xl font-extrabold mono text-slate-900 dark:text-white mt-2">${bikesSoldToday}</div>
+      <div class="text-[11px] text-slate-500 mt-1">Brand new bike sales today</div>
+    </div>
+
+    <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+      <div class="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
+        <span>BIKES SERVICED TODAY</span>
+        <span class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500"><i data-lucide="wrench" class="w-4 h-4"></i></span>
+      </div>
+      <div class="text-xl font-extrabold mono text-slate-900 dark:text-white mt-2">${servicedToday}</div>
+      <div class="text-[11px] text-slate-500 mt-1">Service jobs completed today</div>
+    </div>
+
+    <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+      <div class="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
+        <span>STAFF AT WORK TODAY</span>
+        <span class="p-1.5 rounded-lg bg-sky-500/10 text-sky-500"><i data-lucide="users" class="w-4 h-4"></i></span>
+      </div>
+      <div class="text-xl font-extrabold mono text-slate-900 dark:text-white mt-2">${cameToWork}<span class="text-sm text-slate-400"> / ${activeEmps.length}</span></div>
+      <div class="text-[11px] text-slate-500 mt-1">${attToday.length ? `${presentToday} present, ${halfToday} half day, ${absentToday} absent/leave` : "Attendance not marked yet today"}</div>
+    </div>
+
     <div class="bg-white dark:bg-[#111B36] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
       <div class="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
         <span>TODAY'S SALES</span>
@@ -2375,7 +2417,7 @@ function renderJobs() {
 }
 
 const setStatus = (id, s) => {
-  db.collection("jobs").doc(id).update({ status: s });
+  db.collection("jobs").doc(id).update(s === "Done" ? { status: s, doneDate: today(), doneAt: Date.now() } : { status: s, doneDate: "", doneAt: 0 });
   toast("Job status updated to " + s);
 };
 
